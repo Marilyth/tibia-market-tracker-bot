@@ -1,6 +1,7 @@
 discord.py
 pytest
 pytest-mock
+pylint
 pydantic
 requests
 requests-mock

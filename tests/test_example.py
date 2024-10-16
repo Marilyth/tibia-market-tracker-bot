@@ -1,21 +1,21 @@
 class TestExample:
-    # Run this method once before any test.
+    """Test class for example."""
+
     @classmethod
     def setup_class(cls):
-        pass
+        """Setup the test class."""
 
-    # Run this method once after all tests.
     @classmethod
     def teardown_class(cls):
-        pass
+        """Clean up the test class."""
 
-    def test_Method_Case_ExpectedResult(self):
+    def test_method_case_expected_result(self):
+        """Test method for case returns expected result."""
         # Arrange
         test = 1
-        
+
         # Act
         test += 1
 
         # Assert
         assert test == 2
-        
