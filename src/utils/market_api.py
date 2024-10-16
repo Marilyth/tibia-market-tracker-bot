@@ -1,9 +1,9 @@
 from typing import Dict, Any, List
-from src.utils.data.item_meta_data import ItemMetaData, NPCSaleData
-from src.utils.data.market_values import MarketValues
-from src.utils.data.market_board import MarketBoard, MarketBoardTraderData
-from src.utils.data.world_data import WorldData
-from src.utils.cache_item import CacheableData
+from utils.data.item_meta_data import ItemMetaData, NPCSaleData
+from utils.data.market_values import MarketValues
+from utils.data.market_board import MarketBoard, MarketBoardTraderData
+from utils.data.world_data import WorldData
+from utils.cache_item import CacheableData
 import requests
 import re
 

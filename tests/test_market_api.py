@@ -1,8 +1,8 @@
-from src.utils.market_api import MarketApi
-from src.utils.data.item_meta_data import ItemMetaData
-from src.utils.data.market_values import MarketValues
-from src.utils.data.world_data import WorldData
-from src.utils.json_helper import object_to_json
+from utils.market_api import MarketApi
+from utils.data.item_meta_data import ItemMetaData
+from utils.data.market_values import MarketValues
+from utils.data.world_data import WorldData
+from utils.json_helper import object_to_json
 import pytest
 from datetime import datetime
 

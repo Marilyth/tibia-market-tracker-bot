@@ -1,4 +1,4 @@
-from src.utils.cache_item import CacheableData
+from utils.cache_item import CacheableData
 import time
 
 
