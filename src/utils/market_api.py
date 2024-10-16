@@ -1,7 +1,7 @@
-from typing import Dict, Any, List
-from utils.data.item_meta_data import ItemMetaData, NPCSaleData
+from typing import Dict, Any
+from utils.data.item_meta_data import ItemMetaData
 from utils.data.market_values import MarketValues
-from utils.data.market_board import MarketBoard, MarketBoardTraderData
+from utils.data.market_board import MarketBoard
 from utils.data.world_data import WorldData
 from utils.cache_item import CacheableData
 import requests
@@ -50,7 +50,7 @@ class MarketApi:
 
         if normalized_identifier not in self.identifier_to_id:
             raise ValueError(f"Item with identifier '{normalized_identifier}' not found.")
-        
+
         return self.identifier_to_id[normalized_identifier]
 
     def get_market_values(self, server, identifier: str) -> MarketValues:
@@ -82,7 +82,7 @@ class MarketApi:
         item_id: int = self.identifier_to_item_id(identifier)
 
         return self.meta_data.get()[item_id]
-    
+
     def _load_market_values(self, server: str) -> MarketBoard:
         """Loads and caches the market values of an item in a Tibia server.
 
@@ -151,6 +151,6 @@ class MarketApi:
         Returns:
             Dict: The response of the request.
         """
-        response = requests.get(self.api_url + endpoint, headers=self.headers, params=query_parameters)
+        response = requests.get(self.api_url + endpoint, headers=self.headers, params=query_parameters, timeout=60)
 
         return response.json()

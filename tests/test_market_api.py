@@ -8,15 +8,12 @@ from datetime import datetime
 
 
 class TestMarketApi:
-    # Run this method once before testing.
+    """Test class for the MarketApi class."""
+
     @classmethod
     def setup_class(cls):
+        """Setup the MarketApi object for testing."""
         cls.api = MarketApi("asdf")
-
-    # Run this method once after all tests.
-    @classmethod
-    def teardown_class(cls):
-        del cls.api
 
     def _mock_requests(self, requests_mock):
         item_metadata_response = [ItemMetaData(id=22118, name="tibia coin", wiki_name="Tibia Coin (Something)", npc_buy=[], npc_sell=[])]
@@ -34,7 +31,8 @@ class TestMarketApi:
         " tibia    coin   (22118)  ",
         22118
     ])
-    def test_GetMetaData_WithValidIdentifier_ReturnsExpected(self, requests_mock, identifier: str):
+    def test_get_meta_data_valid_identifier(self, requests_mock, identifier: str):
+        """Test the get_meta_data method with valid identifiers."""
         # Arrange
         self._mock_requests(requests_mock)
 
@@ -44,7 +42,8 @@ class TestMarketApi:
         # Assert
         assert meta_data.id == 22118
 
-    def test_GetMetaData_WithInvalidIdentifier_ThrowsValueError(self, requests_mock):
+    def test_get_meta_data_invalid_identifier_throws(self, requests_mock):
+        """Test the get_meta_data method with an invalid identifier."""
         # Arrange
         self._mock_requests(requests_mock)
 
@@ -52,7 +51,8 @@ class TestMarketApi:
         with pytest.raises(ValueError):
             self.api.get_meta_data("invalid identifier")
 
-    def test_GetMarketValues_WithValidIdentifier_ReturnsExpected(self, requests_mock):
+    def test_get_market_values_valid_identifier(self, requests_mock):
+        """Test the get_market_values method with valid identifiers."""
         # Arrange
         self._mock_requests(requests_mock)
 
@@ -61,8 +61,9 @@ class TestMarketApi:
 
         # Assert
         assert market_values.id == 22118
-    
-    def test_GetMarketValues_WithOutdatedValues_Reloads(self, requests_mock):
+
+    def test_get_market_values_outdated_values_reloads(self, requests_mock):
+        """Test the get_market_values method with outdated values."""
         # Arrange
         self._mock_requests(requests_mock)
         market_values = self.api.get_market_values("Antica", 22118)
@@ -79,8 +80,9 @@ class TestMarketApi:
         # Assert
         assert market_values.time == 0
         assert market_values_new.time == 1
-    
-    def test_GetMarketValues_WithoutOutdatedValues_DoesNotReload(self, requests_mock):
+
+    def test_get_market_values_without_outdated_values_does_not_reload(self, requests_mock):
+        """Test the get_market_values method with outdated but still cached values."""
         # Arrange
         self._mock_requests(requests_mock)
         market_values = self.api.get_market_values("Antica", 22118)

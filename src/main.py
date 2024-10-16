@@ -25,7 +25,7 @@ class MarketBot(discord.ext.commands.AutoShardedBot):
 
 if __name__ == '__main__':
     config_location = os.path.join(os.path.dirname(__file__), "..", "config", "config.json")
-    with open(config_location) as f:
+    with open(config_location, mode="r+", encoding="utf-8") as f:
         config = json.load(f)
 
     MarketBot().run(config["token"])
