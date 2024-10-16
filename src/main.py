@@ -8,6 +8,8 @@ import modules.market
 
 
 class MarketBot(discord.ext.commands.AutoShardedBot):
+    """A discord bot that provides information about the Tibia market.
+    """
     def __init__(self):
         super().__init__(intents=discord.Intents.default(), command_prefix=discord.ext.commands.when_mentioned)
 
