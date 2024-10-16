@@ -98,4 +98,3 @@ class TestMarketApi:
         # Assert
         assert market_values.time == 0
         assert market_values_new.time == 0
-        
