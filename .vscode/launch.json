@@ -27,7 +27,7 @@
             "justMyCode": true
         },
         {
-            "name": "Python: All tests",
+            "name": "Pytest: All tests",
             "type": "debugpy",
             "request": "launch",
             "module": "pytest",
@@ -38,7 +38,7 @@
             "justMyCode": true
         },
         {
-            "name": "Python: Current File (pytest)",
+            "name": "Pytest: Current File",
             "type": "debugpy",
             "request": "launch",
             "module": "pytest",
@@ -52,7 +52,7 @@
             "justMyCode": true
         },
         {
-            "name": "Python: Run Test Method",
+            "name": "Pytest: Run Test Method",
             "type": "debugpy",
             "request": "launch",
             "module": "pytest",
@@ -65,6 +65,13 @@
             ],
             "console": "integratedTerminal",
             "justMyCode": true
+        }
+    ],
+    "inputs": [
+        {
+            "id": "TestMethod",
+            "type": "promptString",
+            "description": "Enter the name of the test method to run."
         }
     ]
 }

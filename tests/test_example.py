@@ -9,7 +9,7 @@ class TestExample:
     def teardown_class(cls):
         pass
 
-    def test_StartGame_WhenCalled_ReturnsTrue(self):
+    def test_Method_Case_ExpectedResult(self):
         # Arrange
         test = 1
         
