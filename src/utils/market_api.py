@@ -12,7 +12,7 @@ class MarketApi:
     """A helper class to interact with the Tibia Market API.
     """
 
-    def __init__(self, token):
+    def __init__(self, token: str):
         self.token = token
         self.http_client = httpx.AsyncClient()
 
@@ -35,9 +35,12 @@ class MarketApi:
         Returns:
             str: The normalized identifier.
         """
+        if not identifier:
+            return ""
+        
         return re.sub(r"\s{2,}", " ", re.sub(r"[^a-z0-9 ]", "", identifier.lower().strip()))
 
-    async def identifier_to_item_id(self, identifier: str) -> Awaitable[int]:
+    async def identifier_to_item_id(self, identifier: str) -> int:
         """Converts an item identifier to it's id.
 
         Args:
@@ -54,7 +57,7 @@ class MarketApi:
 
         return self.identifier_to_id[normalized_identifier]
 
-    async def get_market_values(self, server, identifier: str) -> Awaitable[MarketValues]:
+    async def get_market_values(self, server, identifier: str) -> MarketValues:
         """Get the market values of an item by it's identifier.
 
         Args:
@@ -69,10 +72,11 @@ class MarketApi:
             self.market_values_cache[server] = CacheableData(lambda: self._load_market_values(server), invalidate_after_seconds=3600)
 
         last_world_update = (await self.world_data.get_async())[server].last_update.timestamp()
+        market_values = await self.market_values_cache[server].get_async(last_world_update)
 
-        return (await self.market_values_cache[server].get_async(last_world_update))[item_id]
+        return market_values[item_id]
 
-    async def get_meta_data(self, identifier: str) -> Awaitable[ItemMetaData]:
+    async def get_meta_data(self, identifier: str) -> ItemMetaData:
         """Get the meta data of an item by it's identifier.
 
         Args:
@@ -85,7 +89,7 @@ class MarketApi:
 
         return (await self.meta_data.get_async())[item_id]
 
-    async def _load_market_values(self, server: str) -> Awaitable[MarketBoard]:
+    async def _load_market_values(self, server: str) -> MarketBoard:
         """Loads and caches the market values of an item in a Tibia server.
 
         Args:
@@ -94,7 +98,7 @@ class MarketApi:
         Returns:
             MarketBoard: The market values of an item in a Tibia server.
         """
-        response = await self._send_request("market_values", server=server)
+        response = await self._send_request("market_values", server=server, limit=5000)
 
         market_values = {}
 
@@ -103,7 +107,7 @@ class MarketApi:
 
         return market_values
 
-    async def _load_world_data(self) -> Awaitable[Dict[str, WorldData]]:
+    async def _load_world_data(self) -> Dict[str, WorldData]:
         """Loads and caches the world data of all Tibia servers.
 
         Returns:
@@ -118,7 +122,7 @@ class MarketApi:
 
         return worlds
 
-    async def _load_meta_data(self) -> Awaitable[Dict[str, ItemMetaData]]:
+    async def _load_meta_data(self) -> Dict[str, ItemMetaData]:
         """Loads and caches the meta data of all items.
 
         Returns:
@@ -132,7 +136,7 @@ class MarketApi:
         # Also populate the identifier to id dictionary with any possible identifier.
         for item in response:
             item_meta_data = ItemMetaData(**item)
-            meta_data[item["id"]] = item_meta_data
+            meta_data[item_meta_data.id] = item_meta_data
 
             self.identifier_to_id[str(item["id"])] = item_meta_data.id
             self.identifier_to_id[self.normalize_identifier(item["name"])] = item_meta_data.id
@@ -143,7 +147,7 @@ class MarketApi:
 
         return meta_data
 
-    async def _send_request(self, endpoint: str, **query_parameters: Dict[str, Any]) -> Awaitable[Dict[str, Any]]:
+    async def _send_request(self, endpoint: str, **query_parameters: Dict[str, Any]) -> Dict[str, Any]:
         """Send a request to the Tibia API.
 
         Args:
