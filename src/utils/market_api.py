@@ -85,7 +85,7 @@ class MarketApi:
 
         return (await self.meta_data.get_async())[item_id]
 
-    async def _load_market_values(self, server: str) -> MarketBoard:
+    async def _load_market_values(self, server: str) -> Awaitable[MarketBoard]:
         """Loads and caches the market values of an item in a Tibia server.
 
         Args:
@@ -103,7 +103,7 @@ class MarketApi:
 
         return market_values
 
-    async def _load_world_data(self) -> Dict[str, WorldData]:
+    async def _load_world_data(self) -> Awaitable[Dict[str, WorldData]]:
         """Loads and caches the world data of all Tibia servers.
 
         Returns:
@@ -118,7 +118,7 @@ class MarketApi:
 
         return worlds
 
-    async def _load_meta_data(self) -> Dict[str, ItemMetaData]:
+    async def _load_meta_data(self) -> Awaitable[Dict[str, ItemMetaData]]:
         """Loads and caches the meta data of all items.
 
         Returns:
@@ -143,7 +143,7 @@ class MarketApi:
 
         return meta_data
 
-    async def _send_request(self, endpoint: str, **query_parameters: Dict[str, Any]) -> Dict[str, Any]:
+    async def _send_request(self, endpoint: str, **query_parameters: Dict[str, Any]) -> Awaitable[Dict[str, Any]]:
         """Send a request to the Tibia API.
 
         Args:
