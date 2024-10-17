@@ -1,3 +1,3 @@
 [MAIN]
 max-line-length=240
-disable=wrong-import-order,missing-module-docstring,too-few-public-methods,broad-exception-caught
+disable=wrong-import-order,missing-module-docstring,too-few-public-methods,too-many-instance-attributes,broad-exception-caught
