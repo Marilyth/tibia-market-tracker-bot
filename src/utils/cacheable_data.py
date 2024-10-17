@@ -38,8 +38,6 @@ class CacheableData(Generic[T]):
             self._was_loaded = True
             self._last_load_time = time.time()
 
-            print(f"New value for cache: {self=}")
-
             if not self._is_loop_running and self._delete_after_interval and self._reload_interval_seconds > -1:
                 background_loop.run_in_background(self._check_expired_loop_async)
 
@@ -76,7 +74,7 @@ class CacheableData(Generic[T]):
 
         return self.value
 
-    async def get_async(self, new_data_time: float = -1) -> Awaitable[T]:
+    async def get_async(self, new_data_time: float = -1) -> T:
         """Returns the value of the cache item. If the value needs to be (re)loaded, it will be done so.
 
         Args:
