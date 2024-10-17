@@ -1,7 +1,7 @@
 import time
 import asyncio
 from typing import Generic, TypeVar, Callable, Awaitable
-import utils.background_loop as background_loop
+from utils import background_loop
 
 
 T = TypeVar("T")
@@ -38,11 +38,16 @@ class CacheableData(Generic[T]):
             self._was_loaded = True
             self._last_load_time = time.time()
 
+            print(f"New value for cache: {self=}")
+
             if not self._is_loop_running and self._delete_after_interval and self._reload_interval_seconds > -1:
                 background_loop.run_in_background(self._check_expired_loop_async)
 
-    @value.deleter
-    def value(self):
+    def invalidate(self):
+        """Invalidates the cache, causing the data to be reloaded on the next get call."""
+        if not self._was_loaded:
+            return
+
         del self._value
         self._was_loaded = False
         self._last_load_time = 0
@@ -121,6 +126,6 @@ class CacheableData(Generic[T]):
         time_passed = current_time - self._last_load_time
 
         if self._reload_interval_seconds > -1 and time_passed >= self._reload_interval_seconds:
-            del self.value
+            self.invalidate()
 
         return self._reload_interval_seconds - time_passed

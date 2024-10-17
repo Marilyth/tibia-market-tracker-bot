@@ -2,8 +2,7 @@ discord.py
 pytest
 pytest-mock
 pytest-asyncio
+pytest-httpx
 pylint
 pydantic
-requests
-requests-mock
 httpx

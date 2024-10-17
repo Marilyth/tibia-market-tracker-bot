@@ -1,5 +1,4 @@
-from utils.cache_item import CacheableData
-import utils.background_loop as background_loop
+from utils import background_loop
 import time
 import asyncio
 

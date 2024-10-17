@@ -1,7 +1,5 @@
-from utils.cache_item import CacheableData
+from utils.cacheable_data import CacheableData
 import time
-import pytest
-import asyncio
 
 
 class TestCacheableData:
@@ -22,7 +20,6 @@ class TestCacheableData:
         assert value_a == value_b
         assert value_a != value_c
 
-    @pytest.mark.asyncio
     async def test_delete_with_interval(self):
         """Test if the cache is deleted after the interval."""
         # Arrange
@@ -37,7 +34,6 @@ class TestCacheableData:
         assert value_a is not None
         assert value_b is None
 
-    @pytest.mark.asyncio
     async def test_no_delete_with_interval(self):
         """Test if the cache is not deleted after the interval."""
         # Arrange
@@ -87,7 +83,6 @@ class TestCacheableData:
         assert value_a == value_b
         assert value_a != value_c
 
-    @pytest.mark.asyncio
     async def test_get_async_with_interval(self):
         """Test the get_async method with a reload interval."""
         # Arrange
@@ -103,7 +98,6 @@ class TestCacheableData:
         assert value_a == value_b
         assert value_a != value_c
 
-    @pytest.mark.asyncio
     async def test_get_async_with_sync_loader(self):
         """Test the get method with a reload predicate."""
         # Arrange
