@@ -3,6 +3,7 @@ from utils.market_api import MarketApi
 from utils.data.item_meta_data import ItemMetaData
 from utils.data.market_values import MarketValues
 from utils.data.world_data import WorldData
+from utils.data.market_board import MarketBoard, MarketBoardTraderData
 from utils.json_helper import object_to_json
 import pytest
 from pytest_httpx import HTTPXMock
@@ -100,13 +101,23 @@ class TestMarketApi:
         # Assert
         assert len(history) == 3
 
+    async def test_get_market_board_valid_identifier(self):
+        """Test the get_market_board method with valid identifiers."""
+        # Act
+        market_board = await self.api.get_market_board("Antica", 22118)
+
+        # Assert
+        assert market_board.id == 22118
+
     def _mock_requests(self, httpx_mock: HTTPXMock):
         item_metadata_response = [ItemMetaData(id=22118, name="tibia coin", wiki_name="Tibia Coin (Something)", npc_buy=[], npc_sell=[])]
         market_values_response = [MarketValues(id=22118, time=0)]
         history_response = [MarketValues(id=22118, time=0), MarketValues(id=22118, time=1), MarketValues(id=22118, time=2)]
+        market_board_response = MarketBoard(id=22118, update_time=0, sellers=[MarketBoardTraderData(name="seller", amount=1, price=1, time=0)], buyers=[MarketBoardTraderData(name="buyer", amount=1, price=1, time=0)])
         world_data_response = [WorldData(name="Antica", last_update=datetime.now())]
 
         httpx_mock.add_response(url="https://api.tibiamarket.top:8001/item_metadata", text=object_to_json(item_metadata_response))
         httpx_mock.add_response(url="https://api.tibiamarket.top:8001/market_values?server=Antica&limit=5000", text=object_to_json(market_values_response))
         httpx_mock.add_response(url="https://api.tibiamarket.top:8001/item_history?server=Antica&item_id=22118", text=object_to_json(history_response))
+        httpx_mock.add_response(url="https://api.tibiamarket.top:8001/market_board?server=Antica&item_id=22118", text=object_to_json(market_board_response))
         httpx_mock.add_response(url="https://api.tibiamarket.top:8001/world_data", text=object_to_json(world_data_response))
