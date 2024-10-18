@@ -41,7 +41,7 @@ class ItemMetaData(BaseModel):
         Returns:
             str: The wiki link of the item.
         """
-        return f"https://tibia.fandom.com/wiki/{item_name.replace(" ", "+")}"
+        return f"https://tibia.fandom.com/wiki/{item_name.replace(' ', '+')}"
 
     @staticmethod
     def id_to_image_link(item_id: int) -> str:
