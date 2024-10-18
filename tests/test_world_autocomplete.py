@@ -20,7 +20,7 @@ class TestWorldAutocomplete:
         self.api = MarketApi("asdf")
         self.interaction_mock = SimpleNamespace(client=SimpleNamespace(market_api=self.api))
 
-    async def test_item_autocomplete_many_results_ordered_by_length(self):
+    async def test_world_autocomplete_many_results_ordered_by_length(self):
         """Test the get_meta_data method with valid identifiers."""
         # Arrange
         name = "ra"
@@ -33,7 +33,7 @@ class TestWorldAutocomplete:
         assert choices[0].name == "Fidera"
         assert choices[-1].name == "Calmera"
 
-    async def test_item_autocomplete_non_normal_works(self):
+    async def test_world_autocomplete_non_normal_works(self):
         """Test the get_meta_data method with valid identifiers."""
         # Arrange
         name = "EfIdiA"
@@ -45,7 +45,7 @@ class TestWorldAutocomplete:
         assert len(choices) == 1
         assert choices[0].name == "Efi'dia"
 
-    async def test_item_autocomplete_no_results(self):
+    async def test_world_autocomplete_no_results(self):
         """Test the get_meta_data method with valid identifiers."""
         # Arrange
         name = "invalid"
@@ -56,7 +56,7 @@ class TestWorldAutocomplete:
         # Assert
         assert len(choices) == 0
 
-    async def test_item_autocomplete_no_name(self):
+    async def test_world_autocomplete_no_name(self):
         """Test the get_meta_data method with valid identifiers."""
         # Arrange
         name = ""
