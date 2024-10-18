@@ -60,7 +60,7 @@ class TestMarketApi:
         new_world_data = [WorldData(name="Antica", last_update=datetime.now())]
         new_market_values = [MarketValues(id=22118, time=1)]
         httpx_mock.add_response(url="https://api.tibiamarket.top:8001/world_data", text=object_to_json(new_world_data))
-        httpx_mock.add_response(url="https://api.tibiamarket.top:8001/market_values?server=Antica", text=object_to_json(new_market_values))
+        httpx_mock.add_response(url="https://api.tibiamarket.top:8001/market_values?server=Antica&limit=5000", text=object_to_json(new_market_values))
 
         # Act
         market_values_new = await self.api.get_market_values("Antica", 22118)
@@ -80,7 +80,7 @@ class TestMarketApi:
         new_world_data = [WorldData(name="Antica", last_update=datetime.now())]
         new_market_values = [MarketValues(id=22118, time=1)]
         httpx_mock.add_response(url="https://api.tibiamarket.top:8001/world_data", text=object_to_json(new_world_data))
-        httpx_mock.add_response(url="https://api.tibiamarket.top:8001/market_values?server=Antica", text=object_to_json(new_market_values))
+        httpx_mock.add_response(url="https://api.tibiamarket.top:8001/market_values?server=Antica&limit=5000", text=object_to_json(new_market_values))
 
         # Act
         market_values_new = await self.api.get_market_values("Antica", 22118)
@@ -95,5 +95,5 @@ class TestMarketApi:
         world_data_response = [WorldData(name="Antica", last_update=datetime.now())]
 
         httpx_mock.add_response(url="https://api.tibiamarket.top:8001/item_metadata", text=object_to_json(item_metadata_response))
-        httpx_mock.add_response(url="https://api.tibiamarket.top:8001/market_values?server=Antica", text=object_to_json(market_values_response))
+        httpx_mock.add_response(url="https://api.tibiamarket.top:8001/market_values?server=Antica&limit=5000", text=object_to_json(market_values_response))
         httpx_mock.add_response(url="https://api.tibiamarket.top:8001/world_data", text=object_to_json(world_data_response))

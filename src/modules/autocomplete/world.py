@@ -1,5 +1,4 @@
-import discord.ext.commands as commands
-import discord.app_commands as app_commands
+from discord import app_commands
 from discord.interactions import Interaction
 from typing import List, TYPE_CHECKING, cast
 

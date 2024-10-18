@@ -33,7 +33,7 @@ class MarketBot(discord.ext.commands.AutoShardedBot):
         """Load all module in the modules directory and add them as cogs to the bot."""
         await self.add_cog(Market(self))
         await self.add_cog(General(self))
-        
+
     def run(self, *args, **kwargs):
         """Run the bot with the provided config."""
         super().run(self.config["discord_token"], *args, **kwargs)

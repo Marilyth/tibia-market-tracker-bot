@@ -1,4 +1,4 @@
-from typing import Dict, Any, Awaitable
+from typing import Dict, Any
 from utils.data.item_meta_data import ItemMetaData
 from utils.data.market_values import MarketValues
 from utils.data.market_board import MarketBoard
@@ -37,7 +37,7 @@ class MarketApi:
         """
         if not identifier:
             return ""
-        
+
         return re.sub(r"\s{2,}", " ", re.sub(r"[^a-z0-9 ]", "", identifier.lower().strip()))
 
     async def identifier_to_item_id(self, identifier: str) -> int:

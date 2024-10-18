@@ -1,6 +1,6 @@
 import time
 import asyncio
-from typing import Generic, TypeVar, Callable, Awaitable
+from typing import Generic, TypeVar, Callable
 from utils import background_loop
 
 
@@ -25,6 +25,7 @@ class CacheableData(Generic[T]):
         self._is_async = asyncio.iscoroutinefunction(loader) or asyncio.iscoroutinefunction(reload_predicate)
         self._is_loop_running = False
         self._delete_after_interval = delete_after_interval
+        self._checker_lock = asyncio.Lock()
 
     @property
     def value(self) -> T:
@@ -67,6 +68,7 @@ class CacheableData(Generic[T]):
         predicate_result = self._reload_predicate()
 
         # Check if the value needs to be (re)loaded.
+        # Because this is not async, we can skip the lock.
         if not self._was_loaded or \
            new_data_time > self._last_load_time or \
            predicate_result:
@@ -91,22 +93,24 @@ class CacheableData(Generic[T]):
             predicate_result = await predicate_result
 
         # Check if the value needs to be (re)loaded.
-        if not self._was_loaded or \
-           new_data_time > self._last_load_time or \
-           predicate_result:
-            self.value = self._loader()
+        async with self._checker_lock:
+            if not self._was_loaded or \
+               new_data_time > self._last_load_time or \
+               predicate_result:
+                self.value = self._loader()
 
-            if asyncio.iscoroutine(self.value):
-                self.value = await self.value
+                if asyncio.iscoroutine(self.value):
+                    self.value = await self.value
 
         return self.value
 
     async def _check_expired_loop_async(self):
         """Checks in a loop if the cache item is expired, and deletes the value if it is."""
-        if self._is_loop_running:
-            return
+        async with self._checker_lock:
+            if self._is_loop_running:
+                return
 
-        self._is_loop_running = True
+            self._is_loop_running = True
 
         while True:
             expires_in = self._check_expired()

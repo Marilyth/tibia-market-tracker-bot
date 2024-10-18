@@ -30,11 +30,11 @@ class StatusReel:
     async def get_ping_expression(self):
         """Returns a string expression for the bot's status that shows the bot's latency."""
         return f"{round(self.bot.latency * 1000)}ms ping"
-    
+
     async def get_item_count_expression(self):
         """Returns a string expression for the bot's status that shows the number of items in the market database."""
         return f"Tracking {len(await self.bot.market_api.meta_data.get_async())} items"
-    
+
     async def get_world_count_expression(self):
         """Returns a string expression for the bot's status that shows the number of worlds in the market database."""
         return f"Tracking {len(await self.bot.market_api.world_data.get_async())} worlds"
