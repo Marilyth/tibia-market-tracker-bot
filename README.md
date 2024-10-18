@@ -13,3 +13,28 @@ Depending on your OS, you might need to swap out `python` with `python3`, and `p
   - Go through all things it complain about to keep your code clean
 - Unit tests can be executed using `pytest`
   - If any test fails, resolve it
+ 
+# Contributing
+1. **Fork the Repository**
+   - Click the "Fork" button at the top right corner of this page to create your own copy of the repository
+2. **Clone your fork**
+   - Clone your forked repository to your local machine using
+     ```sh
+     git clone https://github.com/YOUR-USERNAME/tibia-market-tracker-bot.git
+     ```
+3. **Create a new branch**
+   - Before making any changes, create a new branch
+     ```sh
+     git checkout -b my-feature-branch
+     ```
+4. **Make your changes**
+   - Implement your changes and push them
+     ```sh
+     git add .
+     git commit -m "Description of my changes"
+     git push origin my-feature-branch
+     ```
+5. **Create a Pull Request**
+   - Go to the original repository and click on the "Pull Requests" tab
+   - Click the "New Pull Request" button and select your branch
+   - Provide a description of your changes and submit the pull request
