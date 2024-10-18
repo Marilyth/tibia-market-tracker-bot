@@ -30,3 +30,43 @@ class ItemMetaData(BaseModel):
     npc_sell: List[NPCSaleData] = None
     npc_buy: List[NPCSaleData] = None
     wiki_name: Optional[str] = None
+
+    @staticmethod
+    def id_to_wiki_link(item_id: int) -> str:
+        """Converts an item id to a wiki link.
+
+        Args:
+            item_id (int): The item id.
+
+        Returns:
+            str: The wiki link of the item.
+        """
+        return f"https://tibia.fandom.com/wiki/{item_id}"
+
+    @staticmethod
+    def id_to_image_link(item_id: int) -> str:
+        """Converts an item id to an image link.
+
+        Args:
+            item_id (int): The item id.
+
+        Returns:
+            str: The image link of the item.
+        """
+        return f"https://www.tibiamarket.top/sprites/{item_id}.gif"
+
+    def get_wiki_link(self) -> str:
+        """Returns the wiki link of the item.
+
+        Returns:
+            str: The wiki link of the item.
+        """
+        return self.id_to_wiki_link(self.id)
+
+    def get_image_link(self) -> str:
+        """Returns the image link of the item.
+
+        Returns:
+            str: The image link of the item.
+        """
+        return self.id_to_image_link(self.id)

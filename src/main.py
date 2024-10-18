@@ -8,6 +8,7 @@ from modules.market import Market
 from modules.general import General
 from modules.status_reel import StatusReel
 from utils.market_api import MarketApi
+from utils import database
 
 
 class MarketBot(discord.ext.commands.AutoShardedBot):
@@ -16,6 +17,7 @@ class MarketBot(discord.ext.commands.AutoShardedBot):
     def __init__(self, config: Dict[str, str]):
         super().__init__(intents=discord.Intents.default(), command_prefix=discord.ext.commands.when_mentioned)
         self.config = config
+        database.setup_database()
         self.market_api = MarketApi(config["market_api_token"])
         self.status_reel: StatusReel = StatusReel(self)
 

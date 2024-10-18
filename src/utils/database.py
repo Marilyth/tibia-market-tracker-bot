@@ -66,7 +66,7 @@ class DatabaseTable(Generic[T]):
         with _lock_object:
             data_dict = json.loads(json_helper.object_to_json(data))
 
-            return self.table.update(data_dict, query)
+            return self.table.upsert(data_dict, query)
 
     def delete_data(self, query: tinydb.Query) -> List[int]:
         """Delete data from the database.
