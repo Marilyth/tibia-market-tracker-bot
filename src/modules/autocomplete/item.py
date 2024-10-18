@@ -1,12 +1,15 @@
+# pylint: disable=W0613
 from discord import app_commands
+from discord.interactions import Interaction
 from typing import List
 from utils.market_api import MarketApi
 
 
-async def item_autocomplete(current: str) -> List[app_commands.Choice]:
+async def item_autocomplete(interaction: Interaction, current: str) -> List[app_commands.Choice]:
     """Returns a list of item names that match the string.
 
     Args:
+        interaction (Interaction): The interaction that triggered the autocomplete.
         current (str): The current string to match.
     """
     market_api: MarketApi = MarketApi()

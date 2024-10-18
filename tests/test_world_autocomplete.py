@@ -24,7 +24,7 @@ class TestWorldAutocomplete:
         name = "ra"
 
         # Act
-        choices = await world.world_autocomplete(name)
+        choices = await world.world_autocomplete(None, name)
 
         # Assert
         assert len(choices) == 2
@@ -37,7 +37,7 @@ class TestWorldAutocomplete:
         name = "EfIdiA"
 
         # Act
-        choices = await world.world_autocomplete(name)
+        choices = await world.world_autocomplete(None, name)
 
         # Assert
         assert len(choices) == 1
@@ -49,7 +49,7 @@ class TestWorldAutocomplete:
         name = "invalid"
 
         # Act
-        choices = await world.world_autocomplete(name)
+        choices = await world.world_autocomplete(None, name)
 
         # Assert
         assert len(choices) == 0
@@ -60,7 +60,7 @@ class TestWorldAutocomplete:
         name = ""
 
         # Act
-        choices = await world.world_autocomplete(name)
+        choices = await world.world_autocomplete(None, name)
 
         # Assert
         assert len(choices) == 7

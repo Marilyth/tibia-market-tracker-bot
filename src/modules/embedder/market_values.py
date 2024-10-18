@@ -27,9 +27,11 @@ def market_value_to_embedding(item_name: str, world: str, market_values: MarketV
     embed.add_field(name="Buy offer", value=market_values.buy_offer, inline=True)
 
     # Force a new line.
-    embed.add_field(name="\u200b", value="\u200b", inline=False)
+    embed.add_field(name="", value="", inline=False)
 
     embed.add_field(name="Sellers", value=market_values.sell_offers, inline=True)
     embed.add_field(name="Buyers", value=market_values.buy_offers, inline=True)
+
+    embed.set_footer(icon_url="https://www.tibiamarket.top/logo.png", text="Tibia Market API")
 
     return embed

@@ -74,5 +74,7 @@ def get_config():
 
         print(f"Config file created. You can modify it at {config_location}.")
 
+    return config
+
 if __name__ == '__main__':
     MarketBot(get_config()).run()
