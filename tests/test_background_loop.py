@@ -70,3 +70,25 @@ def test_run_in_background_async():
     # Assert
     assert time_start - time.time() < 1.5
     assert values_a == values_b
+
+async def test_async_method_run_in_background_async():
+    """Test the run_in_background method with an asynchronous function."""
+    # Arrange
+    values_a = []
+    values_b = []
+    time_start = time.time()
+
+    async def async_function():
+        for i in range(10):
+            values_a.append(i)
+            await asyncio.sleep(0.1)
+
+    # Act
+    background_loop.run_in_background(async_function)
+    for i in range(10):
+        values_b.append(i)
+        await asyncio.sleep(0.1)
+
+    # Assert
+    assert time_start - time.time() < 1.5
+    assert values_a == values_b

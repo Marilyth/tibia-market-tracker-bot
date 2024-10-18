@@ -1,5 +1,6 @@
 from utils.cacheable_data import CacheableData
 import time
+import asyncio
 
 
 class TestCacheableData:
@@ -27,7 +28,7 @@ class TestCacheableData:
 
         # Act
         value_a = cacheable_data.get()
-        time.sleep(0.2)
+        await asyncio.sleep(0.2)
         value_b = cacheable_data.value
 
         # Assert

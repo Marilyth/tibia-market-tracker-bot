@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Dict, Any, List
 from utils.data.item_meta_data import ItemMetaData
 from utils.data.market_values import MarketValues
 from utils.data.market_board import MarketBoard
@@ -26,6 +26,7 @@ class MarketApi:
         self.world_data: CacheableData[Dict[str, WorldData]] = CacheableData(self._load_world_data, invalidate_after_seconds=60)
         self.meta_data: CacheableData[Dict[int, ItemMetaData]] = CacheableData(self._load_meta_data, invalidate_after_seconds=3600)
         self.market_values_cache: Dict[str, CacheableData[int, MarketValues]] = {}
+        self.history_cache: Dict[str, CacheableData[int, List[MarketValues]]] = {}
 
     @staticmethod
     def normalize_identifier(identifier: str) -> str:
@@ -78,6 +79,27 @@ class MarketApi:
 
         return market_values[item_id]
 
+    async def get_history(self, server: str, identifier: str) -> List[MarketValues]:
+        """Get the market values history of an item by it's identifier.
+
+        Args:
+            server (str): The name of the Tibia server.
+            identifier (str): The identifier of the item.
+
+        Returns:
+            List[MarketValues]: The market values history of the item.
+        """
+        item_id: int = await self.identifier_to_item_id(identifier)
+        key = f"{server}_{item_id}"
+
+        if key not in self.history_cache:
+            self.history_cache[key] = CacheableData(lambda: self._load_history(server, item_id), invalidate_after_seconds=300, delete_after_interval=True)
+
+        last_world_update = (await self.world_data.get_async())[server].last_update.timestamp()
+        history = await self.history_cache[key].get_async(last_world_update)
+
+        return history
+
     async def get_meta_data(self, identifier: str) -> ItemMetaData:
         """Get the meta data of an item by it's identifier.
 
@@ -108,6 +130,20 @@ class MarketApi:
             market_values[item["id"]] = MarketValues(**item)
 
         return market_values
+
+    async def _load_history(self, server: str, item_id: int) -> List[MarketValues]:
+        """Loads and caches the market values history of an item in a Tibia server.
+
+        Args:
+            server (str): The name of the Tibia server.
+            item_id (int): The id of the item.
+
+        Returns:
+            List[MarketValues]: The market values history of an item in a Tibia server.
+        """
+        response = await self._send_request("item_history", server=server, item_id=item_id)
+
+        return [MarketValues(**item) for item in response]
 
     async def _load_world_data(self) -> Dict[str, WorldData]:
         """Loads and caches the world data of all Tibia servers.
