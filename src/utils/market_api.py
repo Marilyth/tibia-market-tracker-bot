@@ -4,15 +4,17 @@ from utils.data.market_values import MarketValues
 from utils.data.market_board import MarketBoard
 from utils.data.world_data import WorldData
 from utils.cacheable_data import CacheableData
+from utils.decorators.singleton import singleton
 import httpx
 import re
 
 
+@singleton
 class MarketApi:
     """A helper class to interact with the Tibia Market API.
     """
 
-    def __init__(self, token: str):
+    def __init__(self, token: str = None):
         self.token = token
         self.http_client = httpx.AsyncClient()
 

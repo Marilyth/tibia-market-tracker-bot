@@ -1,3 +1,4 @@
+# pylint: disable=E1123
 from utils.market_api import MarketApi
 from utils.data.item_meta_data import ItemMetaData
 from utils.data.market_values import MarketValues
@@ -17,7 +18,7 @@ class TestMarketApi:
     def setup_method(self, httpx_mock: HTTPXMock):
         """Setup the MarketApi object for testing."""
         self._mock_requests(httpx_mock)
-        self.api = MarketApi("asdf")
+        self.api = MarketApi("asdf", force_new=True)
 
     @pytest.mark.parametrize("identifier", [
         " tibia coin",

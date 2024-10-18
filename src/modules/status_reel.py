@@ -2,6 +2,7 @@ import discord
 import discord.ext.commands
 import asyncio
 from typing import List, Awaitable, Callable, TYPE_CHECKING
+from utils.market_api import MarketApi
 
 if TYPE_CHECKING:
     from main import MarketBot
@@ -12,6 +13,7 @@ class StatusReel:
 
     def __init__(self, bot: "MarketBot"):
         self.bot = bot
+        self.market_api = MarketApi()
         self.reel_text_getters: List[Awaitable[Callable[[], str]]] = []
 
     def start_reel(self):
@@ -33,11 +35,11 @@ class StatusReel:
 
     async def get_item_count_expression(self):
         """Returns a string expression for the bot's status that shows the number of items in the market database."""
-        return f"Tracking {len(await self.bot.market_api.meta_data.get_async())} items"
+        return f"Tracking {len(await self.market_api.meta_data.get_async())} items"
 
     async def get_world_count_expression(self):
         """Returns a string expression for the bot's status that shows the number of worlds in the market database."""
-        return f"Tracking {len(await self.bot.market_api.world_data.get_async())} worlds"
+        return f"Tracking {len(await self.market_api.world_data.get_async())} worlds"
 
     async def _reel(self):
         """Loops through the reel_text_getters and changes the bot's status every 30 seconds."""
