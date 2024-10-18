@@ -14,7 +14,7 @@ class DiscordUser(BaseModel):
     def save(self):
         """Saves the user to the database."""
         table = database.get_table(DiscordUser)
-        table.update_data(self, Query().id == self.id)
+        table.update_data(Query().id == self.id, self)
 
     @staticmethod
     def from_database(user_id: int) -> "DiscordUser":
