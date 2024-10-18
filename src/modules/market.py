@@ -1,5 +1,5 @@
 from discord.ext import commands
-import discord.app_commands as app_commands
+from discord import app_commands
 from typing import TYPE_CHECKING
 from modules.autocomplete.item import item_autocomplete
 from modules.autocomplete.world import world_autocomplete

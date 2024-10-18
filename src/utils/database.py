@@ -1,10 +1,10 @@
 import tinydb
 import os
 import threading
-from utils import json_helper
 import json
 from typing import TypeVar, Generic, Union, List
 from pydantic import BaseModel
+from utils import json_helper
 
 
 _lock_object = threading.Lock()
