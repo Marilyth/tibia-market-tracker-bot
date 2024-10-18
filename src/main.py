@@ -38,10 +38,39 @@ class MarketBot(discord.ext.commands.AutoShardedBot):
         """Run the bot with the provided config."""
         super().run(self.config["discord_token"], *args, **kwargs)
 
+def get_config():
+    """Gets or creates the config for the bot."""
+    config_location = os.path.join(os.path.dirname(__file__), "..", "config", "config.json")
+    rewrite_config = False
+
+    os.makedirs(os.path.dirname(config_location), exist_ok=True)
+
+    config = {
+        "discord_token": "",
+        "market_api_token": ""
+    }
+
+    # Load the config file if it exists.
+    if os.path.exists(config_location):
+        with open(config_location, mode="r+", encoding="utf-8") as f:
+            saved_config = json.load(f)
+
+        for key in saved_config:
+            if key in config:
+                config[key] = saved_config[key]
+
+    # Prompt the user for any missing values.
+    for key, value in config.items():
+        if not value:
+            config[key] = input(f"Enter your {key}: ")
+            rewrite_config = True
+
+    # Write the config file if it was modified.
+    if rewrite_config:
+        with open(config_location, mode="w+", encoding="utf-8") as f:
+            json.dump(config, f, indent=4)
+
+        print(f"Config file created. You can modify it at {config_location}.")
 
 if __name__ == '__main__':
-    config_location = os.path.join(os.path.dirname(__file__), "..", "config", "config.json")
-    with open(config_location, mode="r+", encoding="utf-8") as f:
-        config_dict = json.load(f)
-
-    MarketBot(config_dict).run()
+    MarketBot(get_config()).run()
