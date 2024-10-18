@@ -26,7 +26,7 @@ class TestItemAutocomplete:
         name = "sword"
 
         # Act
-        choices = await item.item_autocomplete(name)
+        choices = await item.item_autocomplete(None, name)
 
         # Assert
         assert len(choices) == 3
@@ -39,7 +39,7 @@ class TestItemAutocomplete:
         name = "npcs magic things"
 
         # Act
-        choices = await item.item_autocomplete(name)
+        choices = await item.item_autocomplete(None, name)
 
         # Assert
         assert len(choices) == 1
@@ -51,7 +51,7 @@ class TestItemAutocomplete:
         name = "invalid"
 
         # Act
-        choices = await item.item_autocomplete(name)
+        choices = await item.item_autocomplete(None, name)
 
         # Assert
         assert len(choices) == 0
@@ -62,7 +62,7 @@ class TestItemAutocomplete:
         name = ""
 
         # Act
-        choices = await item.item_autocomplete(name)
+        choices = await item.item_autocomplete(None, name)
 
         # Assert
         assert len(choices) == 8
