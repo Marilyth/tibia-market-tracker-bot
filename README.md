@@ -16,7 +16,7 @@ Depending on your OS, you might need to swap out `python` with `python3`, and `p
  
 # Contributing
 1. **Fork the Repository**
-   - Click the "Fork" button at the top right corner of this page to create your own copy of the repository
+   - Go [here](https://github.com/Marilyth/tibia-market-tracker-bot/fork) to create your own copy of the repository
 2. **Clone your fork**
    - Clone your forked repository to your local machine using
      ```sh
@@ -35,6 +35,5 @@ Depending on your OS, you might need to swap out `python` with `python3`, and `p
      git push origin my-feature-branch
      ```
 5. **Create a Pull Request**
-   - Go to the original repository and click on the "Pull Requests" tab
-   - Click the "New Pull Request" button and select your branch
+   - Go [here](https://github.com/Marilyth/tibia-market-tracker-bot/compare) and select your feature branch
    - Provide a description of your changes and submit the pull request
