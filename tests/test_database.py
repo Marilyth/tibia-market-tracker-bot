@@ -4,6 +4,11 @@ from pydantic import BaseModel
 import pytest
 
 
+class TestUser(BaseModel):
+    """A class representing a user."""
+    name: str
+    age: int
+
 class TestDatabase:
     """A class to test the database module."""
 
@@ -86,9 +91,3 @@ class TestDatabase:
         # Assert
         assert len(found_data) == 0
         assert insert_id == deleted_id
-
-
-class TestUser(BaseModel):
-    """A class representing a user."""
-    name: str
-    age: int

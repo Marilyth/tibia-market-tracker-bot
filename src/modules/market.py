@@ -3,6 +3,7 @@ from discord import app_commands
 from typing import TYPE_CHECKING
 from modules.autocomplete.item import item_autocomplete
 from modules.autocomplete.world import world_autocomplete
+from utils.market_api import MarketApi
 
 if TYPE_CHECKING:
     from main import MarketBot
@@ -13,6 +14,7 @@ class Market(commands.Cog):
     """
     def __init__(self, bot: "MarketBot"):
         self.bot = bot
+        self.market_api = MarketApi()
 
     @commands.hybrid_command(name='market_value')
     @app_commands.autocomplete(item=item_autocomplete, world=world_autocomplete)
@@ -26,6 +28,6 @@ class Market(commands.Cog):
         """
         await ctx.defer()
 
-        market_values = await self.bot.market_api.get_market_values(world, item)
+        market_values = await self.market_api.get_market_values(world, item)
 
         await ctx.send(market_values.sell_offer)

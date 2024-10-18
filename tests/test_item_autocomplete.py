@@ -1,6 +1,6 @@
+# pylint: disable=E1123
 from datetime import datetime
 from pytest_httpx import HTTPXMock
-from types import SimpleNamespace
 from modules.autocomplete import item
 from utils.market_api import MarketApi
 from utils.data.item_meta_data import ItemMetaData
@@ -13,14 +13,12 @@ import pytest
 class TestItemAutocomplete:
     """Test class for the item autocomplete function."""
     api = None
-    interaction_mock = None
 
     @pytest.fixture(autouse=True, scope="function")
     def setup_method(self, httpx_mock: HTTPXMock):
         """Setup the MarketApi object for testing."""
         self._mock_requests(httpx_mock)
-        self.api = MarketApi("asdf")
-        self.interaction_mock = SimpleNamespace(client=SimpleNamespace(market_api=self.api))
+        MarketApi(force_new=True)
 
     async def test_item_autocomplete_many_results_ordered_by_length(self):
         """Test the get_meta_data method with valid identifiers."""
@@ -28,7 +26,7 @@ class TestItemAutocomplete:
         name = "sword"
 
         # Act
-        choices = await item.item_autocomplete(self.interaction_mock, name)
+        choices = await item.item_autocomplete(name)
 
         # Assert
         assert len(choices) == 3
@@ -41,7 +39,7 @@ class TestItemAutocomplete:
         name = "npcs magic things"
 
         # Act
-        choices = await item.item_autocomplete(self.interaction_mock, name)
+        choices = await item.item_autocomplete(name)
 
         # Assert
         assert len(choices) == 1
@@ -53,7 +51,7 @@ class TestItemAutocomplete:
         name = "invalid"
 
         # Act
-        choices = await item.item_autocomplete(self.interaction_mock, name)
+        choices = await item.item_autocomplete(name)
 
         # Assert
         assert len(choices) == 0
@@ -64,7 +62,7 @@ class TestItemAutocomplete:
         name = ""
 
         # Act
-        choices = await item.item_autocomplete(self.interaction_mock, name)
+        choices = await item.item_autocomplete(name)
 
         # Assert
         assert len(choices) == 8
