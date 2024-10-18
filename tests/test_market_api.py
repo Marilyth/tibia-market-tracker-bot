@@ -34,7 +34,7 @@ class TestMarketApi:
 
         # Assert
         assert meta_data.id == 22118
-        assert meta_data.get_wiki_link() == "https://tibia.fandom.com/wiki/22118"
+        assert meta_data.get_wiki_link() == "https://tibia.fandom.com/wiki/Tibia Coin (Something)"
         assert meta_data.get_image_link() == "https://www.tibiamarket.top/sprites/22118.gif"
 
     async def test_get_meta_data_invalid_identifier_throws(self):
@@ -92,11 +92,21 @@ class TestMarketApi:
         assert market_values.time == 0
         assert market_values_new.time == 0
 
+    async def test_get_history_valid_identifier(self):
+        """Test the get_history method with valid identifiers."""
+        # Act
+        history = await self.api.get_history("Antica", 22118)
+
+        # Assert
+        assert len(history) == 3
+
     def _mock_requests(self, httpx_mock: HTTPXMock):
         item_metadata_response = [ItemMetaData(id=22118, name="tibia coin", wiki_name="Tibia Coin (Something)", npc_buy=[], npc_sell=[])]
         market_values_response = [MarketValues(id=22118, time=0)]
+        history_response = [MarketValues(id=22118, time=0), MarketValues(id=22118, time=1), MarketValues(id=22118, time=2)]
         world_data_response = [WorldData(name="Antica", last_update=datetime.now())]
 
         httpx_mock.add_response(url="https://api.tibiamarket.top:8001/item_metadata", text=object_to_json(item_metadata_response))
         httpx_mock.add_response(url="https://api.tibiamarket.top:8001/market_values?server=Antica&limit=5000", text=object_to_json(market_values_response))
+        httpx_mock.add_response(url="https://api.tibiamarket.top:8001/item_history?server=Antica&item_id=22118", text=object_to_json(history_response))
         httpx_mock.add_response(url="https://api.tibiamarket.top:8001/world_data", text=object_to_json(world_data_response))

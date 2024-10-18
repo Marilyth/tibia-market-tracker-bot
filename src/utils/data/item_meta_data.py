@@ -32,16 +32,16 @@ class ItemMetaData(BaseModel):
     wiki_name: Optional[str] = None
 
     @staticmethod
-    def id_to_wiki_link(item_id: int) -> str:
+    def name_to_wiki_link(item_name: str) -> str:
         """Converts an item id to a wiki link.
 
         Args:
-            item_id (int): The item id.
+            item_name (str): The item name.
 
         Returns:
             str: The wiki link of the item.
         """
-        return f"https://tibia.fandom.com/wiki/{item_id}"
+        return f"https://tibia.fandom.com/wiki/{item_name}"
 
     @staticmethod
     def id_to_image_link(item_id: int) -> str:
@@ -61,7 +61,7 @@ class ItemMetaData(BaseModel):
         Returns:
             str: The wiki link of the item.
         """
-        return self.id_to_wiki_link(self.id)
+        return self.name_to_wiki_link(self.wiki_name if self.wiki_name else self.name)
 
     def get_image_link(self) -> str:
         """Returns the image link of the item.

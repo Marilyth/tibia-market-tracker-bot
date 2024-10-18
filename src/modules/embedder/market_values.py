@@ -19,7 +19,7 @@ def market_value_to_embedding(item_name: str, world: str, market_values: MarketV
         title=f"{item_name} on {world}",
         timestamp=datetime.fromtimestamp(market_values.time),
         color=discord.Color.blue(),
-        url=ItemMetaData.id_to_wiki_link(market_values.id)
+        url=ItemMetaData.name_to_wiki_link(item_name)
     )
 
     embed.set_thumbnail(url=ItemMetaData.id_to_image_link(market_values.id))
