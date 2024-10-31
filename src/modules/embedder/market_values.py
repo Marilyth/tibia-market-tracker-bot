@@ -1,37 +1,103 @@
 import discord
+from typing import List
 from datetime import datetime
-from utils.data.item_meta_data import ItemMetaData
+from utils.data.item_meta_data import ItemMetaData, NPCSaleData
 from utils.data.market_values import MarketValues
+from utils.market_api import MarketApi
+from utils import GOLD_COIN_EMOJI
+from modules.embedder.default import get_default_embed
 
 
-def market_value_to_embedding(item_name: str, world: str, market_values: MarketValues):
+def sale_data_to_expression(sale_data: List[NPCSaleData], reverse_sorting: bool, character_limit: int = 1024, line_limit: int = 5) -> str:
+    """Converts a list of NPCSaleData objects to a string expression that can be used in an embed field.
+    
+    Args:
+        sale_data (List[NPCSaleData]): The list of NPCSaleData objects.
+        reverse_sorting (bool): Whether to sort the sale data in reverse order.
+        character_limit (int, optional): The maximum amount of characters in the expression. Defaults to 1024.
+        line_limit (int, optional): The maximum amount of lines in the expression. Defaults to 5.
+        
+    Returns:
+        str: The string expression.
+    """
+    api = MarketApi()
+
+    sale_data_expressions = []
+
+    for sale_data_item in sorted(sale_data, key=lambda x: x.price, reverse=reverse_sorting):
+        currency_id = sale_data_item.currency_object_type_id
+        npc_name = f"[{sale_data_item.name}]({ItemMetaData.name_to_wiki_link(sale_data_item.name)})"
+
+        # Check if the currency is gold, if so, use the gold coin emoji.
+        if currency_id == 0:
+            currency = GOLD_COIN_EMOJI
+        # Check if the currency is a known item, if so, use the item name and link.
+        elif currency_id in api.meta_data.value:
+            currency_metadata = api.meta_data.value[currency_id]
+            currency = currency_metadata.wiki_name if currency_metadata.wiki_name else currency_metadata.name
+            currency = f"[{currency}]({currency_metadata.get_wiki_link()})"
+        # If the currency is unknown, use the object type id.
+        else:
+            currency = f"_UnknownCurrency:{sale_data_item.currency_object_type_id}_"
+
+        sale_data_expressions.append(f"{npc_name} in {sale_data_item.location} for {sale_data_item.price:,} {currency}")
+
+    expression = ""
+    for i, sale_data_expression in enumerate(sale_data_expressions):
+        if len(expression) + len(sale_data_expression) > (character_limit - 16) or i >= line_limit:
+            expression += f"_And {len(sale_data_expressions) - i} more..._"
+            break
+
+        expression += f"{sale_data_expression}\n"
+
+    return expression
+
+def market_value_to_embedding(world: str, market_values: MarketValues, meta_data: ItemMetaData) -> discord.Embed:
     """Converts a MarketValues object to a discord.Embed object.
     
     Args:
-        item_name (str): The name of the item.
         world (str): The name of the world.
         market_values (MarketValues): The market values of the item.
+        meta_data (ItemMetaData): The meta data of the item.
         
     Returns:
         discord.Embed: The embed object.
     """
-    embed = discord.embeds.Embed(
-        title=f"{item_name} on {world}",
-        timestamp=datetime.fromtimestamp(market_values.time),
-        color=discord.Color.blue(),
-        url=ItemMetaData.name_to_wiki_link(item_name)
-    )
+    embed = get_default_embed()
+    embed.description = f"[{meta_data.wiki_name if meta_data.wiki_name else meta_data.name}]({meta_data.get_wiki_link()}) on {world}"
+    embed.timestamp = datetime.fromtimestamp(market_values.time)
 
     embed.set_thumbnail(url=ItemMetaData.id_to_image_link(market_values.id))
-    embed.add_field(name="Sell offer", value=market_values.sell_offer, inline=True)
-    embed.add_field(name="Buy offer", value=market_values.buy_offer, inline=True)
 
-    # Force a new line.
-    embed.add_field(name="", value="", inline=False)
+    # Add the market values to the embed.
+    sell_values = {
+        "Price": f"{market_values.day_average_sell if market_values.day_average_sell > 0 else market_values.sell_offer:,}{GOLD_COIN_EMOJI}",
+        "Sellers": market_values.sell_offers,
+        "Sold": market_values.month_sold,
+        "": None,
+        "Highest": f"{market_values.month_highest_sell:,}{GOLD_COIN_EMOJI}",
+        "Average": f"{market_values.month_average_sell:,}{GOLD_COIN_EMOJI}",
+        "Lowest": f"{market_values.month_lowest_sell:,}{GOLD_COIN_EMOJI}"
+    }
 
-    embed.add_field(name="Sellers", value=market_values.sell_offers, inline=True)
-    embed.add_field(name="Buyers", value=market_values.buy_offers, inline=True)
+    buy_values = {
+        "Price": f"{market_values.buy_offer if market_values.buy_offer > 0 else market_values.day_average_buy:,}{GOLD_COIN_EMOJI}",
+        "Buyers": market_values.buy_offers,
+        "Bought": market_values.month_bought,
+        "": None,
+        "Highest": f"{market_values.month_highest_buy:,}{GOLD_COIN_EMOJI}",
+        "Average": f"{market_values.month_average_buy:,}{GOLD_COIN_EMOJI}",
+        "Lowest": f"{market_values.month_lowest_buy:,}{GOLD_COIN_EMOJI}"
+    }
 
-    embed.set_footer(icon_url="https://www.tibiamarket.top/logo.png", text="Tibia Market API")
+    embed.add_field(name="Sell data", value="\n".join([f"`{key}`: {value}" if key else "" for key, value in sell_values.items()]), inline=True)
+    embed.add_field(name="Buy data", value="\n".join([f"`{key}`: {value}" if key else "" for key, value in buy_values.items()]), inline=True)
+
+    # Add the NPC sale and buy data to the embed if available.
+    if meta_data.npc_sell:
+        embed.add_field(name="Buy from", value=sale_data_to_expression(meta_data.npc_sell, False, line_limit=4), inline=False)
+
+    if meta_data.npc_buy:
+        embed.add_field(name="Sell to", value=sale_data_to_expression(meta_data.npc_buy, True, line_limit=4), inline=False)
 
     return embed

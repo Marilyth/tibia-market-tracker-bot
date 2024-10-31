@@ -7,6 +7,8 @@ from utils.cacheable_data import CacheableData
 from utils.decorators.singleton import singleton
 import httpx
 import re
+import asyncio
+from time import time
 
 
 @singleton
@@ -44,6 +46,29 @@ class MarketApi:
 
         return re.sub(r"\s{2,}", " ", re.sub(r"[^a-z0-9 ]", "", identifier.lower().strip()))
 
+    @staticmethod
+    def normalize_world(server: str) -> str:
+        """Normalizes a Tibia server name.
+
+        Args:
+            server (str): The name of the Tibia server.
+
+        Returns:
+            str: The normalized server name.
+        """
+        return server.strip().capitalize()
+
+    async def throw_if_world_not_found(self, server: str):
+        """Throws a ValueError if the world is not found.
+
+        Args:
+            server (str): The name of the Tibia server.
+        """
+        worlds = await self.world_data.get_async()
+
+        if self.normalize_world(server) not in worlds:
+            raise ValueError(f"World '{server}' not found. Available worlds are: {', '.join(worlds.keys())}")
+
     async def identifier_to_item_id(self, identifier: str) -> int:
         """Converts an item identifier to it's id.
 
@@ -71,6 +96,9 @@ class MarketApi:
             MarketValues: The market values of the item.
         """
         item_id: int = await self.identifier_to_item_id(identifier)
+        server = self.normalize_world(server)
+
+        await self.throw_if_world_not_found(server)
 
         if server not in self.market_values_cache:
             self.market_values_cache[server] = CacheableData(lambda: self._load_market_values(server), invalidate_after_seconds=3600)
@@ -91,6 +119,10 @@ class MarketApi:
             List[MarketValues]: The market values history of the item.
         """
         item_id: int = await self.identifier_to_item_id(identifier)
+        server = self.normalize_world(server)
+
+        await self.throw_if_world_not_found(server)
+
         key = f"{server}_{item_id}"
 
         if key not in self.history_cache:
@@ -112,6 +144,10 @@ class MarketApi:
             MarketBoard: The market board of the item.
         """
         item_id: int = await self.identifier_to_item_id(identifier)
+        server = self.normalize_world(server)
+
+        await self.throw_if_world_not_found(server)
+
         key = f"{server}_{item_id}"
 
         if key not in self.market_board_cache:
@@ -232,5 +268,14 @@ class MarketApi:
             Dict: The response of the request.
         """
         response = await self.http_client.get(self.api_url + endpoint, headers=self.headers, params=query_parameters, timeout=60)
+
+        # If ratelimited, wait for the ratelimit to reset.
+        if response.status_code == 429:
+            reset_timestamp = float(response.headers["X-Ratelimit-Reset"])
+            reset_time = max(0, reset_timestamp - time())
+
+            await asyncio.sleep(reset_time)
+
+            return await self._send_request(endpoint, **query_parameters)
 
         return response.json()

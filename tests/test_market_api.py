@@ -9,6 +9,7 @@ import pytest
 from pytest_httpx import HTTPXMock
 from datetime import datetime
 import asyncio
+import time
 
 
 class TestMarketApi:
@@ -35,7 +36,7 @@ class TestMarketApi:
 
         # Assert
         assert meta_data.id == 22118
-        assert meta_data.get_wiki_link() == "https://tibia.fandom.com/wiki/Tibia+Coin+(Something)"
+        assert meta_data.get_wiki_link() == "https://tibia.fandom.com/wiki/Tibia_Coin_(Something)"
         assert meta_data.get_image_link() == "https://www.tibiamarket.top/sprites/22118.gif"
 
     async def test_get_meta_data_invalid_identifier_throws(self):
@@ -48,6 +49,20 @@ class TestMarketApi:
         """Test the get_market_values method with valid identifiers."""
         # Act
         market_values = await self.api.get_market_values("Antica", 22118)
+
+        # Assert
+        assert market_values.id == 22118
+
+    async def test_get_market_values_invalid_world_throws(self):
+        """Test the get_market_values method with an invalid world."""
+        # Act & Assert
+        with pytest.raises(ValueError):
+            await self.api.get_market_values("invalid world", 22118)
+
+    async def test_get_market_values_normalizes_world(self):
+        """Test the get_market_values method with an non-normalized world."""
+        # Act
+        market_values = await self.api.get_market_values("   anTIcA   ", 22118)
 
         # Assert
         assert market_values.id == 22118
@@ -109,7 +124,29 @@ class TestMarketApi:
         # Assert
         assert market_board.id == 22118
 
+    async def test_send_request_ratelimit(self, httpx_mock: HTTPXMock):
+        """Test if the send_request method handles ratelimits correctly."""
+        # Arrange
+        # Get the default response out of the way.
+        await self.api.get_market_values("Antica", 22118)
+        self.api.market_values_cache["Antica"].invalidate()
+
+        # Add a ratelimit response, followed by the default response.
+        httpx_mock.add_response(url="https://api.tibiamarket.top:8001/market_values?server=Antica&limit=5000", status_code=429, headers={"X-Ratelimit-Reset": f"{time.time() + 1.1}"})
+        httpx_mock.add_response(url="https://api.tibiamarket.top:8001/market_values?server=Antica&limit=5000", text=object_to_json([MarketValues(id=22118, time=0)]))
+
+        # Act
+        start_time = time.time()
+        await self.api.get_market_values("Antica", 22118)
+        end_time = time.time()
+
+        # Assert
+        assert end_time - start_time >= 1 and end_time - start_time < 2
+        assert len(httpx_mock.get_requests(url="https://api.tibiamarket.top:8001/market_values?server=Antica&limit=5000")) == 3
+
     def _mock_requests(self, httpx_mock: HTTPXMock):
+        httpx_mock.reset()
+
         item_metadata_response = [ItemMetaData(id=22118, name="tibia coin", wiki_name="Tibia Coin (Something)", npc_buy=[], npc_sell=[])]
         market_values_response = [MarketValues(id=22118, time=0)]
         history_response = [MarketValues(id=22118, time=0), MarketValues(id=22118, time=1), MarketValues(id=22118, time=2)]

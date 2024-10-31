@@ -7,6 +7,7 @@ from typing import Dict
 from modules.market import Market
 from modules.general import General
 from modules.status_reel import StatusReel
+from modules.embedder.default import get_default_error_embed
 from utils.market_api import MarketApi
 from utils import database
 
@@ -20,6 +21,24 @@ class MarketBot(discord.ext.commands.AutoShardedBot):
         database.setup_database()
         self.market_api = MarketApi(config["market_api_token"])
         self.status_reel: StatusReel = StatusReel(self)
+
+    async def on_command_error(self, context: discord.ext.commands.Context, exception: discord.ext.commands.errors.CommandError, /) -> None:
+        """Notify the user on command errors.
+
+        Args:
+            context (discord.ext.commands.Context): The context of the command.
+            exception (discord.ext.commands.errors.CommandError): The exception that was raised.
+        """
+        arguments = ", ".join([f"{key}=\"{value}\"" for key, value in context.kwargs.items()])
+        command_name = context.command.qualified_name if context.command else "Unknown command"
+
+        if arguments:
+            arguments = f"({arguments})"
+
+        embed = get_default_error_embed(f"{command_name}", exception)
+        await context.send(embed=embed)
+
+        await super().on_command_error(context, exception)
 
     async def on_ready(self):
         """Start the status reel when the bot is ready."""
