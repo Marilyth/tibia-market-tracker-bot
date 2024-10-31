@@ -5,6 +5,7 @@ from modules.autocomplete.item import item_autocomplete
 from modules.autocomplete.world import world_autocomplete
 from modules.embedder.market_values import market_value_to_embedding
 from modules.embedder.history import history_to_embedding
+from modules.embedder.market_board import market_board_to_embedding
 from utils.market_api import MarketApi
 from utils import get_default_world
 
@@ -19,7 +20,11 @@ class Market(commands.Cog):
         self.bot = bot
         self.market_api = MarketApi()
 
-    @commands.hybrid_command()
+    @commands.hybrid_group(invoke_without_command=False)
+    async def item(self, ctx: commands.Context):
+        """Group command for item-related commands."""
+
+    @item.command("value")
     @commands.cooldown(1, 5, commands.BucketType.user)
     @app_commands.autocomplete(item=item_autocomplete, world=world_autocomplete)
     async def market_value(self, ctx: commands.Context, item: str, world: str = None):
@@ -46,7 +51,7 @@ class Market(commands.Cog):
         # Send the embed.
         await ctx.send(embed=embed)
 
-    @commands.hybrid_command()
+    @item.command("history")
     @commands.cooldown(1, 5, commands.BucketType.user)
     @app_commands.autocomplete(item=item_autocomplete, world=world_autocomplete)
     @app_commands.choices(
@@ -82,3 +87,29 @@ class Market(commands.Cog):
 
         # Send the embed.
         await ctx.send(embed=embed, file=file)
+
+    @item.command("board")
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    @app_commands.autocomplete(item=item_autocomplete, world=world_autocomplete)
+    async def item_board(self, ctx: commands.Context, item: str, world: str = None):
+        """Responds with the market board of an item.
+
+        Args:
+            ctx (commands.Context): The context of the command.
+            item (str): The name of the item to get the market board of.
+            world (str, optional): The world to get the market board from.
+        """
+        await ctx.defer()
+
+        # Get the default world if none is provided.
+        if not world:
+            world = get_default_world(ctx)
+
+        # Fetch the market board from the API.
+        market_board = await self.market_api.get_market_board(world, item)
+        meta_data = await self.market_api.get_meta_data(item)
+
+        embed = market_board_to_embedding(world, market_board, meta_data)
+
+        # Send the embed.
+        await ctx.send(embed=embed)

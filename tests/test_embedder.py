@@ -1,8 +1,10 @@
 # pylint: disable=W0201,E1101
 from modules.embedder.market_values import market_value_to_embedding, sale_data_to_expression
 from modules.embedder.history import history_to_embedding
+from modules.embedder.market_board import market_board_to_embedding, dict_to_table
 from utils.data.item_meta_data import NPCSaleData, ItemMetaData
 from utils.data.market_values import MarketValues
+from utils.data.market_board import MarketBoard, MarketBoardTraderData
 from utils.market_api import MarketApi
 from utils import GOLD_COIN_EMOJI
 import pytest
@@ -101,6 +103,47 @@ class TestEmbedder:
         assert len(embed.fields) == 2
         assert file.filename == "plot.png"
         assert embed.image.url == "attachment://plot.png"
+
+    def test_dict_to_table(self):
+        """Test the dict_to_table function."""
+        # Arrange
+        data = [
+            {"Name": "Sample Item", "Price": 100, "Location": "Town"},
+            {"Name": "Sample", "Price": 100, "Location": "Town B"},
+            {"Name": "Sam", "Price": 1003, "Location": "Town"},
+        ]
+
+        # Act
+        table = dict_to_table(data)
+
+        # Assert
+        assert table == '```sql\nName        | Price | Location\n------------------------------\nSample Item   100     Town    \nSample        100     Town B  \nSam           1003    Town    \n```'
+
+    def test_market_board_to_embedding(self):
+        """Test the market_board_to_embedding function."""
+        # Arrange
+        sellers = [
+            MarketBoardTraderData(name="Seller", amount=12, price=1, time=0),
+            MarketBoardTraderData(name="Seller 1", amount=1, price=1, time=0),
+            MarketBoardTraderData(name="Seller 2", amount=1, price=14, time=0),
+        ]
+
+        buyers = [
+            MarketBoardTraderData(name="Buyer", amount=1, price=1, time=0),
+            MarketBoardTraderData(name="Buyer", amount=1, price=1, time=0),
+            MarketBoardTraderData(name="Buyer", amount=1, price=1, time=0),
+        ]
+
+        market_board = MarketBoard(id=1, sellers=sellers, buyers=buyers, update_time=0)
+
+        # Act
+        embed = market_board_to_embedding("Antica", market_board, self.meta_data)
+
+        # Assert
+        assert embed.description == "[Sample Item](https://tibia.fandom.com/wiki/Sample_Item) on Antica"
+        assert embed.fields[0].name == "Sell offers"
+        assert embed.fields[1].name == "Buy offers"
+        assert len(embed.fields) == 2
 
     @staticmethod
     def create_sample_npc_sale_data(name="Sample NPC", location="Town", price=100, currency_id=0) -> NPCSaleData:
