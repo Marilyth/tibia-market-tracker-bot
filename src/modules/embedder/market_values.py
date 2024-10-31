@@ -24,7 +24,7 @@ def sale_data_to_expression(sale_data: List[NPCSaleData], reverse_sorting: bool,
 
     sale_data_expressions = []
 
-    for sale_data_item in sale_data.sort(key=lambda x: x.price, reverse=reverse_sorting):
+    for sale_data_item in sorted(sale_data, key=lambda x: x.price, reverse=reverse_sorting):
         currency_id = sale_data_item.currency_object_type_id
         npc_name = f"[{sale_data_item.name}]({ItemMetaData.name_to_wiki_link(sale_data_item.name)})"
 
@@ -45,7 +45,7 @@ def sale_data_to_expression(sale_data: List[NPCSaleData], reverse_sorting: bool,
     expression = ""
     for i, sale_data_expression in enumerate(sale_data_expressions):
         if len(expression) + len(sale_data_expression) > (character_limit - 16) or i >= line_limit:
-            expression += f"\n_And {len(sale_data_expressions) - i} more..._"
+            expression += f"_And {len(sale_data_expressions) - i} more..._"
             break
 
         expression += f"{sale_data_expression}\n"
@@ -90,8 +90,8 @@ def market_value_to_embedding(world: str, market_values: MarketValues, meta_data
         "Lowest": f"{market_values.month_lowest_buy:,}{GOLD_COIN_EMOJI}"
     }
 
-    embed.add_field(name="Sell data", value="\n".join([f"`{key}`: {value}" if key else "\n" for key, value in sell_values.items()]), inline=True)
-    embed.add_field(name="Buy data", value="\n".join([f"`{key}`: {value}" if key else "\n" for key, value in buy_values.items()]), inline=True)
+    embed.add_field(name="Sell data", value="\n".join([f"`{key}`: {value}" if key else "" for key, value in sell_values.items()]), inline=True)
+    embed.add_field(name="Buy data", value="\n".join([f"`{key}`: {value}" if key else "" for key, value in buy_values.items()]), inline=True)
 
     # Add the NPC sale and buy data to the embed if available.
     if meta_data.npc_sell:
