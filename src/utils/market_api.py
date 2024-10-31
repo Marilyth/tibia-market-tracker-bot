@@ -237,7 +237,7 @@ class MarketApi:
 
         # If ratelimited, wait for the ratelimit to reset.
         if response.status_code == 429:
-            reset_timestamp = int(response.headers["X-Ratelimit-Reset"])
+            reset_timestamp = float(response.headers["X-Ratelimit-Reset"])
             reset_time = max(0, reset_timestamp - time())
 
             await asyncio.sleep(reset_time)
