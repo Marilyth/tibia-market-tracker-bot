@@ -108,12 +108,13 @@ class MarketApi:
 
         return market_values[item_id]
 
-    async def get_history(self, server: str, identifier: str) -> List[MarketValues]:
+    async def get_history(self, server: str, identifier: str, timespan: int) -> List[MarketValues]:
         """Get the market values history of an item by it's identifier.
 
         Args:
             server (str): The name of the Tibia server.
             identifier (str): The identifier of the item.
+            timespan (int): The amount of days ago to get the history from.
 
         Returns:
             List[MarketValues]: The market values history of the item.
@@ -123,10 +124,10 @@ class MarketApi:
 
         await self.throw_if_world_not_found(server)
 
-        key = f"{server}_{item_id}"
+        key = f"{server}_{item_id}_{timespan}"
 
         if key not in self.history_cache:
-            self.history_cache[key] = CacheableData(lambda: self._load_history(server, item_id), invalidate_after_seconds=300, delete_after_interval=True)
+            self.history_cache[key] = CacheableData(lambda: self._load_history(server, item_id, timespan), invalidate_after_seconds=300, delete_after_interval=True)
 
         last_world_update = (await self.world_data.get_async())[server].last_update.timestamp()
         history = await self.history_cache[key].get_async(last_world_update)
@@ -189,17 +190,18 @@ class MarketApi:
 
         return market_values
 
-    async def _load_history(self, server: str, item_id: int) -> List[MarketValues]:
+    async def _load_history(self, server: str, item_id: int, timespan: int) -> List[MarketValues]:
         """Loads and caches the market values history of an item in a Tibia server.
 
         Args:
             server (str): The name of the Tibia server.
             item_id (int): The id of the item.
+            timespan (int): The amount of days ago to get the history from.
 
         Returns:
             List[MarketValues]: The market values history of an item in a Tibia server.
         """
-        response = await self._send_request("item_history", server=server, item_id=item_id)
+        response = await self._send_request("item_history", server=server, item_id=item_id, start_days_ago=timespan)
 
         return [MarketValues(**item) for item in response]
 

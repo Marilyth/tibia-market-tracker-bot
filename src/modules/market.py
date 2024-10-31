@@ -49,13 +49,23 @@ class Market(commands.Cog):
     @commands.hybrid_command()
     @commands.cooldown(1, 5, commands.BucketType.user)
     @app_commands.autocomplete(item=item_autocomplete, world=world_autocomplete)
-    async def item_history(self, ctx: commands.Context, item: str, world: str = None):
+    @app_commands.choices(
+        timespan=[
+            app_commands.Choice(name="Last Week", value=7),
+            app_commands.Choice(name="Last Month", value=30),
+            app_commands.Choice(name="Last 6 Months", value=180),
+            app_commands.Choice(name="Last Year", value=365),
+            app_commands.Choice(name="All Time", value=9999),
+        ]
+    )
+    async def item_history(self, ctx: commands.Context, item: str, world: str = None, timespan: int = 30):
         """Responds with the market history of an item.
 
         Args:
             ctx (commands.Context): The context of the command.
             item (str): The name of the item to get the market history of.
             world (str, optional): The world to get the market history from.
+            timespan (int, optional): The amount of days to get the history of. Defaults to 30.
         """
         await ctx.defer()
 
@@ -64,7 +74,7 @@ class Market(commands.Cog):
             world = get_default_world(ctx)
 
         # Fetch the market history from the API.
-        market_history = await self.market_api.get_history(world, item)
+        market_history = await self.market_api.get_history(world, item, timespan)
         meta_data = await self.market_api.get_meta_data(item)
 
         # Create a pretty embed with the market history.

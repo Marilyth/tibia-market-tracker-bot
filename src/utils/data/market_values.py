@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import List
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+import numpy as np
 from io import BytesIO
 
 
@@ -47,12 +48,14 @@ class MarketValues(BaseModel):
         """
         plt.ioff()
 
-        time = [market_value.time / (24 * 3600) for market_value in market_values]
+        time = np.array([market_value.time / (24 * 3600) for market_value in market_values], dtype=np.float64)
         sell = [market_value.day_average_sell if market_value.day_average_sell > -1 else market_value.sell_offer for market_value in market_values]
         buy = [market_value.day_average_buy if market_value.day_average_buy > -1 else market_value.buy_offer for market_value in market_values]
 
-        sell = [price if price > 0 else None for price in sell]
-        buy = [price if price > 0 else None for price in buy]
+        sell = np.array([price if price > 0 else None for price in sell], dtype=np.float64)
+        buy = np.array([price if price > 0 else None for price in buy], dtype=np.float64)
+        sell_mask = np.isfinite(sell)
+        buy_mask = np.isfinite(buy)
 
         line_color = "#A9A9A9"
         buy_color = "#8884d8"
@@ -63,6 +66,7 @@ class MarketValues(BaseModel):
         figure.tight_layout()
 
         subplot = figure.add_subplot(111, facecolor=None)
+        subplot.grid(True, color=line_color, linestyle="--", linewidth=0.5, which="major", axis="both", alpha=0.25)
         subplot.set_xlim(min(time), max(time))
         subplot.spines["top"].set_visible(False)
         subplot.spines["right"].set_visible(False)
@@ -77,8 +81,8 @@ class MarketValues(BaseModel):
         figure.autofmt_xdate()
 
         # Plot the sell and buy values.
-        subplot.plot(time, sell, label="Sell price", linestyle="-", color=sell_color, marker="o" if len(sell) < 31 else None)
-        subplot.plot(time, buy, label="Buy price", linestyle="-", color=buy_color, marker="o" if len(buy) < 31 else None)
+        subplot.plot(time[sell_mask], sell[sell_mask], label="Sell price", linestyle="-", color=sell_color, marker="o" if len(sell) < 31 else None)
+        subplot.plot(time[buy_mask], buy[buy_mask], label="Buy price", linestyle="-", color=buy_color, marker="o" if len(buy) < 31 else None)
 
         # Set the labels and title.
         subplot.set_xlabel("Time", color=line_color)
