@@ -3,7 +3,6 @@ import os
 import json
 import discord.ext
 import discord.ext.commands
-from discord.ext.commands import BotT
 from typing import Dict
 from modules.market import Market
 from modules.general import General
@@ -23,7 +22,7 @@ class MarketBot(discord.ext.commands.AutoShardedBot):
         self.market_api = MarketApi(config["market_api_token"])
         self.status_reel: StatusReel = StatusReel(self)
 
-    async def on_command_error(self, context: discord.ext.commands.Context[BotT], exception: discord.ext.commands.errors.CommandError, /) -> None:
+    async def on_command_error(self, context: discord.ext.commands.Context, exception: discord.ext.commands.errors.CommandError, /) -> None:
         """Notify the user on command errors.
 
         Args:
