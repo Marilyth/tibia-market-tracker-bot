@@ -145,6 +145,26 @@ class TestEmbedder:
         assert embed.fields[1].name == "Buy offers"
         assert len(embed.fields) == 2
 
+    def test_market_board_to_embedding_no_sellers(self):
+        """Test the market_board_to_embedding function."""
+        # Arrange
+        sellers = []
+
+        buyers = [
+            MarketBoardTraderData(name="Buyer", amount=1, price=1, time=0),
+            MarketBoardTraderData(name="Buyer", amount=1, price=1, time=0),
+            MarketBoardTraderData(name="Buyer", amount=1, price=1, time=0),
+        ]
+
+        market_board = MarketBoard(id=1, sellers=sellers, buyers=buyers, update_time=0)
+
+        # Act
+        embed = market_board_to_embedding("Antica", market_board, self.meta_data)
+
+        # Assert
+        assert embed.description == "[Sample Item](https://tibia.fandom.com/wiki/Sample_Item) on Antica"
+        assert embed.fields[0].value == "No offers"
+
     @staticmethod
     def create_sample_npc_sale_data(name="Sample NPC", location="Town", price=100, currency_id=0) -> NPCSaleData:
         """Creates a sample NPCSaleData object.

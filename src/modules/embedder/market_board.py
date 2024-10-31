@@ -60,8 +60,10 @@ def market_board_to_embedding(world: str, market_board: MarketBoard, meta_data: 
 
     sell_board = [{"Name": seller.name, "Amount": f"{seller.amount:,}", "Price": f"{seller.price:,}", "Ends": datetime.fromtimestamp(seller.time).strftime(date_format)} for seller in sell_board]
     buy_board = [{"Name": buyer.name, "Amount": f"{buyer.amount:,}", "Price": f"{buyer.price:,}", "Ends": datetime.fromtimestamp(buyer.time).strftime(date_format)} for buyer in buy_board]
+    sell_board.sort(key=lambda x: x["Price"])
+    buy_board.sort(key=lambda x: x["Price"], reverse=True)
 
-    embed.add_field(name="Sell offers", value=dict_to_table(sell_board), inline=False)
-    embed.add_field(name="Buy offers", value=dict_to_table(buy_board), inline=False)
+    embed.add_field(name="Sell offers", value=dict_to_table(sell_board) if sell_board else "No offers", inline=False)
+    embed.add_field(name="Buy offers", value=dict_to_table(buy_board) if buy_board else "No offers", inline=False)
 
     return embed
