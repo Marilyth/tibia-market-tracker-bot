@@ -8,11 +8,14 @@ from utils import GOLD_COIN_EMOJI
 from modules.embedder.default import get_default_embed
 
 
-def sale_data_to_expression(sale_data: List[NPCSaleData]) -> str:
+def sale_data_to_expression(sale_data: List[NPCSaleData], reverse_sorting: bool, character_limit: int = 1024, line_limit: int = 5) -> str:
     """Converts a list of NPCSaleData objects to a string expression that can be used in an embed field.
     
     Args:
         sale_data (List[NPCSaleData]): The list of NPCSaleData objects.
+        reverse_sorting (bool): Whether to sort the sale data in reverse order.
+        character_limit (int, optional): The maximum amount of characters in the expression. Defaults to 1024.
+        line_limit (int, optional): The maximum amount of lines in the expression. Defaults to 5.
         
     Returns:
         str: The string expression.
@@ -21,7 +24,7 @@ def sale_data_to_expression(sale_data: List[NPCSaleData]) -> str:
 
     sale_data_expressions = []
 
-    for sale_data_item in sale_data:
+    for sale_data_item in sale_data.sort(key=lambda x: x.price, reverse=reverse_sorting):
         currency_id = sale_data_item.currency_object_type_id
         npc_name = f"[{sale_data_item.name}]({ItemMetaData.name_to_wiki_link(sale_data_item.name)})"
 
@@ -39,7 +42,15 @@ def sale_data_to_expression(sale_data: List[NPCSaleData]) -> str:
 
         sale_data_expressions.append(f"{npc_name} in {sale_data_item.location} for {sale_data_item.price:,} {currency}")
 
-    return "\n".join(sale_data_expressions)[:1024]
+    expression = ""
+    for i, sale_data_expression in enumerate(sale_data_expressions):
+        if len(expression) + len(sale_data_expression) > (character_limit - 16) or i >= line_limit:
+            expression += f"\n_And {len(sale_data_expressions) - i} more..._"
+            break
+
+        expression += f"{sale_data_expression}\n"
+
+    return expression
 
 def market_value_to_embedding(world: str, market_values: MarketValues, meta_data: ItemMetaData) -> discord.Embed:
     """Converts a MarketValues object to a discord.Embed object.
@@ -84,9 +95,9 @@ def market_value_to_embedding(world: str, market_values: MarketValues, meta_data
 
     # Add the NPC sale and buy data to the embed if available.
     if meta_data.npc_sell:
-        embed.add_field(name="Buy from", value=sale_data_to_expression(meta_data.npc_sell), inline=False)
+        embed.add_field(name="Buy from", value=sale_data_to_expression(meta_data.npc_sell, False, line_limit=4), inline=False)
 
     if meta_data.npc_buy:
-        embed.add_field(name="Sell to", value=sale_data_to_expression(meta_data.npc_buy), inline=False)
+        embed.add_field(name="Sell to", value=sale_data_to_expression(meta_data.npc_buy, True, line_limit=4), inline=False)
 
     return embed
