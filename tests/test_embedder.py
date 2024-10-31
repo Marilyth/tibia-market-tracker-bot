@@ -117,7 +117,7 @@ class TestEmbedder:
         table = dict_to_table(data)
 
         # Assert
-        assert table == '```sql\nName        | Price | Location\n------------------------------\nSample Item   100     Town    \nSample        100     Town B  \nSam           1003    Town    \n```'
+        assert table == '```sql\nName        | Price | Location\n------------------------------\nSample Item | 100   | Town    \nSample      | 100   | Town B  \nSam         | 1003  | Town    \n```'
 
     def test_market_board_to_embedding(self):
         """Test the market_board_to_embedding function."""
