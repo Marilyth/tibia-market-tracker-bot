@@ -33,8 +33,8 @@ def history_to_embedding(world: str, market_values: List[MarketValues], meta_dat
     valid_sell_values = valid_buy_values = 0
 
     for market_value in market_values:
-        current_sell_value = market_value.sell_offer if market_value.sell_offer > 0 else market_value.day_average_sell
-        current_buy_value = market_value.buy_offer if market_value.buy_offer > 0 else market_value.day_average_buy
+        current_sell_value = market_value.day_average_sell if market_value.day_average_sell > -1 else market_value.sell_offer
+        current_buy_value = market_value.day_average_buy if market_value.day_average_buy > -1 else market_value.buy_offer
 
         if current_sell_value > 0:
             valid_sell_values += 1
