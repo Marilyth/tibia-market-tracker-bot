@@ -48,8 +48,11 @@ class MarketValues(BaseModel):
         plt.ioff()
 
         time = [market_value.time / (24 * 3600) for market_value in market_values]
-        sell = [market_value.day_average_sell if market_value.day_average_sell > 0 else market_value.sell_offer if market_value.sell_offer > 0 else None for market_value in market_values]
-        buy = [market_value.day_average_buy if market_value.day_average_buy > 0 else market_value.buy_offer if market_value.buy_offer > 0 else None for market_value in market_values]
+        sell = [market_value.day_average_sell if market_value.day_average_sell > -1 else market_value.sell_offer for market_value in market_values]
+        buy = [market_value.day_average_buy if market_value.day_average_buy > -1 else market_value.buy_offer for market_value in market_values]
+
+        sell = [price if price > 0 else None for price in sell]
+        buy = [price if price > 0 else None for price in buy]
 
         line_color = "#A9A9A9"
         buy_color = "#8884d8"
