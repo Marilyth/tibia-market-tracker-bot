@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from modules.autocomplete.world import world_autocomplete
 from utils.data.user import DiscordUser
 from utils.data.discord_server import DiscordServer
+from utils.market_api import MarketApi
 
 if TYPE_CHECKING:
     from main import MarketBot
@@ -39,6 +40,9 @@ class General(commands.Cog):
         await ctx.defer()
 
         user = DiscordUser.from_database(ctx.author.id)[0]
+        default_world = MarketApi().normalize_world(default_world)
+        await MarketApi().throw_if_world_not_found(default_world)
+
         user.default_world = default_world
         user.save()
 
@@ -58,6 +62,9 @@ class General(commands.Cog):
         await ctx.defer()
 
         server =  DiscordServer.from_database(ctx.guild.id)[0]
+        default_world = MarketApi().normalize_world(default_world)
+        await MarketApi().throw_if_world_not_found(default_world)
+
         server.default_world = default_world
         server.save()
 
