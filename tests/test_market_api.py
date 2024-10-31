@@ -111,7 +111,7 @@ class TestMarketApi:
     async def test_get_history_valid_identifier(self):
         """Test the get_history method with valid identifiers."""
         # Act
-        history = await self.api.get_history("Antica", 22118)
+        history = await self.api.get_history("Antica", 22118, 7)
 
         # Assert
         assert len(history) == 3
@@ -155,6 +155,6 @@ class TestMarketApi:
 
         httpx_mock.add_response(url="https://api.tibiamarket.top:8001/item_metadata", text=object_to_json(item_metadata_response))
         httpx_mock.add_response(url="https://api.tibiamarket.top:8001/market_values?server=Antica&limit=5000", text=object_to_json(market_values_response))
-        httpx_mock.add_response(url="https://api.tibiamarket.top:8001/item_history?server=Antica&item_id=22118", text=object_to_json(history_response))
+        httpx_mock.add_response(url="https://api.tibiamarket.top:8001/item_history?server=Antica&item_id=22118&start_days_ago=7", text=object_to_json(history_response))
         httpx_mock.add_response(url="https://api.tibiamarket.top:8001/market_board?server=Antica&item_id=22118", text=object_to_json(market_board_response))
         httpx_mock.add_response(url="https://api.tibiamarket.top:8001/world_data", text=object_to_json(world_data_response))

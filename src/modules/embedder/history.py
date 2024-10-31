@@ -60,9 +60,9 @@ def history_to_embedding(world: str, market_values: List[MarketValues], meta_dat
     avg_buy = avg_buy // valid_buy_values if valid_buy_values > 0 else 0
 
     if valid_sell_values:
-        embed.add_field(name="Sell data", value=f"`Max`: {max_sell:,}{GOLD_COIN_EMOJI} <t:{max_sell_timestamp}:R>\n`Min`: {min_sell:,}{GOLD_COIN_EMOJI} <t:{min_sell_timestamp}:R>\n`Avg`: {avg_sell:,}")
+        embed.add_field(name="Sell data", value=f"`Max`: {max_sell:,}{GOLD_COIN_EMOJI}\n<t:{max_sell_timestamp}:R>\n`Min`: {min_sell:,}{GOLD_COIN_EMOJI}\n<t:{min_sell_timestamp}:R>\n`Avg`: {avg_sell:,}")
 
     if valid_buy_values:
-        embed.add_field(name="Buy data", value=f"`Max`: {max_buy:,}{GOLD_COIN_EMOJI} <t:{max_buy_timestamp}:R>\n`Min`: {min_buy:,}{GOLD_COIN_EMOJI} <t:{min_buy_timestamp}:R>\n`Avg`: {avg_buy:,}")
+        embed.add_field(name="Buy data", value=f"`Max`: {max_buy:,}{GOLD_COIN_EMOJI}\n<t:{max_buy_timestamp}:R>\n`Min`: {min_buy:,}{GOLD_COIN_EMOJI}\n<t:{min_buy_timestamp}:R>\n`Avg`: {avg_buy:,}")
 
     return embed, file
