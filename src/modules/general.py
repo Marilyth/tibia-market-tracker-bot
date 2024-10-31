@@ -17,6 +17,14 @@ class General(commands.Cog):
     def __init__(self, bot: "MarketBot"):
         self.bot = bot
 
+    @commands.hybrid_group(invoke_without_command=False, name='config')
+    async def user_config(self, ctx: commands.Context):
+        """A group command for user configuration commands."""
+
+    @commands.hybrid_group(invoke_without_command=False, name='server-config')
+    async def server_config(self, ctx: commands.Context):
+        """A group command for server configuration commands."""
+
     @commands.hybrid_command(name='ping')
     @commands.cooldown(1, 1, commands.BucketType.user)
     async def ping(self, ctx: commands.Context):
@@ -27,7 +35,7 @@ class General(commands.Cog):
         await asyncio.sleep(1)
         await ctx.send('Pong')
 
-    @commands.hybrid_command()
+    @user_config.command(name='world')
     @commands.cooldown(1, 1, commands.BucketType.user)
     @app_commands.autocomplete(default_world=world_autocomplete)
     async def default_world(self, ctx: commands.Context, default_world: str):
@@ -48,7 +56,7 @@ class General(commands.Cog):
 
         await ctx.send(f"Set your default world to {default_world}.")
 
-    @commands.hybrid_command()
+    @server_config.command(name='world')
     @commands.cooldown(1, 1, commands.BucketType.guild)
     @app_commands.autocomplete(default_world=world_autocomplete)
     @commands.has_permissions(manage_guild=True)
