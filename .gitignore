@@ -163,3 +163,4 @@ cython_debug/
 
 config/config.json
 database.json
+*.png

@@ -7,3 +7,4 @@ pylint
 pydantic
 httpx
 tinydb
+matplotlib
