@@ -16,31 +16,32 @@ def market_value_to_embedding(item_name: str, world: str, market_values: MarketV
         discord.Embed: The embed object.
     """
     embed = get_default_embed()
-    embed.title = f"{item_name} on {world}"
+    embed.description = f"[{item_name}]({ItemMetaData.name_to_wiki_link(item_name)}) on {world}"
     embed.timestamp = datetime.fromtimestamp(market_values.time)
-    embed.url = ItemMetaData.name_to_wiki_link(item_name)
 
     embed.set_thumbnail(url=ItemMetaData.id_to_image_link(market_values.id))
 
     sell_values = {
-        "Sell price": market_values.day_average_sell if market_values.day_average_sell > 0 else market_values.sell_offer,
+        "Price": f"{market_values.day_average_sell if market_values.day_average_sell > 0 else market_values.sell_offer:,}<:Gold_Coin:1301485099161751562>",
         "Sellers": market_values.sell_offers,
+        "Sold": market_values.month_sold,
         "": None,
-        "Highest price": market_values.month_highest_sell,
-        "Average price": market_values.month_average_sell,
-        "Lowest price": market_values.month_lowest_sell
+        "Highest": f"{market_values.month_highest_sell:,}<:Gold_Coin:1301485099161751562>",
+        "Average": f"{market_values.month_average_sell:,}<:Gold_Coin:1301485099161751562>",
+        "Lowest": f"{market_values.month_lowest_sell:,}<:Gold_Coin:1301485099161751562>"
     }
 
     buy_values = {
-        "Buy offer": market_values.buy_offer if market_values.buy_offer > 0 else market_values.day_average_buy,
+        "Price": f"{market_values.buy_offer if market_values.buy_offer > 0 else market_values.day_average_buy:,}<:Gold_Coin:1301485099161751562>",
         "Buyers": market_values.buy_offers,
+        "Bought": market_values.month_bought,
         "": None,
-        "Highest price": market_values.month_highest_buy,
-        "Average price": market_values.month_average_buy,
-        "Lowest price": market_values.month_lowest_buy
+        "Highest": f"{market_values.month_highest_buy:,}<:Gold_Coin:1301485099161751562>",
+        "Average": f"{market_values.month_average_buy:,}<:Gold_Coin:1301485099161751562>",
+        "Lowest": f"{market_values.month_lowest_buy:,}<:Gold_Coin:1301485099161751562>"
     }
 
-    embed.add_field(name="Sell data", value="\n".join([f"**{key}:** {value:,}" if value else "\n" for key, value in sell_values.items()]), inline=True)
-    embed.add_field(name="Buy data", value="\n".join([f"**{key}:** {value:,}" if value else "\n" for key, value in buy_values.items()]), inline=True)
+    embed.add_field(name="Sell data", value="\n".join([f"`{key}`: {value}" if key else "\n" for key, value in sell_values.items()]), inline=True)
+    embed.add_field(name="Buy data", value="\n".join([f"`{key}`: {value}" if key else "\n" for key, value in buy_values.items()]), inline=True)
 
     return embed
