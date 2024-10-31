@@ -13,9 +13,9 @@ def get_default_world(ctx: commands.Context) -> str:
         str: The default world.
     """
     if ctx.guild:
-        default_world, has_default = DiscordServer.from_database(ctx.guild.id)
+        discord_server, has_default = DiscordServer.from_database(ctx.guild.id)
 
         if has_default:
-            return default_world
+            return discord_server.default_world
 
     return DiscordUser.from_database(ctx.author.id)[0].default_world
