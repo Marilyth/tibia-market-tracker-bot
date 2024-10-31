@@ -1,7 +1,7 @@
-import discord
 from datetime import datetime
 from utils.data.item_meta_data import ItemMetaData
 from utils.data.market_values import MarketValues
+from modules.embedder.default import get_default_embed
 
 
 def market_value_to_embedding(item_name: str, world: str, market_values: MarketValues):
@@ -15,23 +15,32 @@ def market_value_to_embedding(item_name: str, world: str, market_values: MarketV
     Returns:
         discord.Embed: The embed object.
     """
-    embed = discord.embeds.Embed(
-        title=f"{item_name} on {world}",
-        timestamp=datetime.fromtimestamp(market_values.time),
-        color=discord.Color.blue(),
-        url=ItemMetaData.name_to_wiki_link(item_name)
-    )
+    embed = get_default_embed()
+    embed.title = f"{item_name} on {world}"
+    embed.timestamp = datetime.fromtimestamp(market_values.time)
+    embed.url = ItemMetaData.name_to_wiki_link(item_name)
 
     embed.set_thumbnail(url=ItemMetaData.id_to_image_link(market_values.id))
-    embed.add_field(name="Sell offer", value=market_values.sell_offer, inline=True)
-    embed.add_field(name="Buy offer", value=market_values.buy_offer, inline=True)
 
-    # Force a new line.
-    embed.add_field(name="", value="", inline=False)
+    sell_values = {
+        "Sell price": market_values.day_average_sell if market_values.day_average_sell > 0 else market_values.sell_offer,
+        "Sellers": market_values.sell_offers,
+        "": None,
+        "Highest price": market_values.month_highest_sell,
+        "Average price": market_values.month_average_sell,
+        "Lowest price": market_values.month_lowest_sell
+    }
 
-    embed.add_field(name="Sellers", value=market_values.sell_offers, inline=True)
-    embed.add_field(name="Buyers", value=market_values.buy_offers, inline=True)
+    buy_values = {
+        "Buy offer": market_values.buy_offer if market_values.buy_offer > 0 else market_values.day_average_buy,
+        "Buyers": market_values.buy_offers,
+        "": None,
+        "Highest price": market_values.month_highest_buy,
+        "Average price": market_values.month_average_buy,
+        "Lowest price": market_values.month_lowest_buy
+    }
 
-    embed.set_footer(icon_url="https://www.tibiamarket.top/logo.png", text="Tibia Market API")
+    embed.add_field(name="Sell data", value="\n".join([f"**{key}:** {value:,}" if value else "\n" for key, value in sell_values.items()]), inline=True)
+    embed.add_field(name="Buy data", value="\n".join([f"**{key}:** {value:,}" if value else "\n" for key, value in buy_values.items()]), inline=True)
 
     return embed

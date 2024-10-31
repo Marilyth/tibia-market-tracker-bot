@@ -19,6 +19,7 @@ class Market(commands.Cog):
         self.market_api = MarketApi()
 
     @commands.hybrid_command(name='market_value')
+    @commands.cooldown(1, 5, commands.BucketType.user)
     @app_commands.autocomplete(item=item_autocomplete, world=world_autocomplete)
     async def market_value(self, ctx: commands.Context, item: str, world: str = None):
         """Responds with the current market value of an item.
