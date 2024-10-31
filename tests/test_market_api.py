@@ -36,7 +36,7 @@ class TestMarketApi:
 
         # Assert
         assert meta_data.id == 22118
-        assert meta_data.get_wiki_link() == "https://tibia.fandom.com/wiki/Tibia+Coin+(Something)"
+        assert meta_data.get_wiki_link() == "https://tibia.fandom.com/wiki/Tibia_Coin_(Something)"
         assert meta_data.get_image_link() == "https://www.tibiamarket.top/sprites/22118.gif"
 
     async def test_get_meta_data_invalid_identifier_throws(self):
