@@ -24,8 +24,9 @@ def get_default_error_embed(command_name: str, exception: discord.ext.commands.C
     embed = discord.embeds.Embed(color=0xff0000)
 
     embed.set_author(name="Click to join the support server!", icon_url="https://www.tibiamarket.top/logo.png", url="https://discord.gg/Rvc8mXtmZH")
-
     embed.description = f"Sorry! An error occurred while executing the command `{command_name}`.\nFeel free to join the [support server](https://discord.gg/Rvc8mXtmZH) for help."
-    embed.add_field(name="Error", value=f"```{exception}```")
+
+    exception_expression = str(exception).rsplit("raised an exception: ", maxsplit=1)[-1]
+    embed.add_field(name="Error", value=f"```{exception_expression}```")
 
     return embed

@@ -53,6 +53,20 @@ class TestMarketApi:
         # Assert
         assert market_values.id == 22118
 
+    async def test_get_market_values_invalid_world_throws(self):
+        """Test the get_market_values method with an invalid world."""
+        # Act & Assert
+        with pytest.raises(ValueError):
+            await self.api.get_market_values("invalid world", 22118)
+
+    async def test_get_market_values_normalizes_world(self):
+        """Test the get_market_values method with an non-normalized world."""
+        # Act
+        market_values = await self.api.get_market_values("   anTIcA   ", 22118)
+
+        # Assert
+        assert market_values.id == 22118
+
     async def test_get_market_values_outdated_values_reloads(self, httpx_mock: HTTPXMock):
         """Test the get_market_values method with outdated values."""
         # Arrange
