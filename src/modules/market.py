@@ -37,9 +37,10 @@ class Market(commands.Cog):
 
         # Fetch the market values from the API.
         market_values = await self.market_api.get_market_values(world, item)
+        meta_data = await self.market_api.get_meta_data(item)
 
         # Create a pretty embed with the market values.
-        embed = market_value_to_embedding(item, world, market_values)
+        embed = market_value_to_embedding(world, market_values, meta_data)
 
         # Send the embed.
         await ctx.send(embed=embed)
