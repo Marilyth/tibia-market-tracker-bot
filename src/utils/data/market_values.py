@@ -63,6 +63,7 @@ class MarketValues(BaseModel):
         figure.tight_layout()
 
         subplot = figure.add_subplot(111, facecolor=None)
+        subplot.set_xlim(min(time), max(time))
         subplot.spines["top"].set_visible(False)
         subplot.spines["right"].set_visible(False)
         subplot.spines["bottom"].set_color(line_color)
@@ -76,8 +77,8 @@ class MarketValues(BaseModel):
         figure.autofmt_xdate()
 
         # Plot the sell and buy values.
-        subplot.plot(time, sell, label="Sell price", linestyle="-", color=sell_color)
-        subplot.plot(time, buy, label="Buy price", linestyle="-", color=buy_color)
+        subplot.plot(time, sell, label="Sell price", linestyle="-", color=sell_color, marker="o" if len(sell) < 31 else None)
+        subplot.plot(time, buy, label="Buy price", linestyle="-", color=buy_color, marker="o" if len(buy) < 31 else None)
 
         # Set the labels and title.
         subplot.set_xlabel("Time", color=line_color)
