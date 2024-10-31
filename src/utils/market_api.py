@@ -7,6 +7,8 @@ from utils.cacheable_data import CacheableData
 from utils.decorators.singleton import singleton
 import httpx
 import re
+import asyncio
+from time import time
 
 
 @singleton
@@ -232,5 +234,14 @@ class MarketApi:
             Dict: The response of the request.
         """
         response = await self.http_client.get(self.api_url + endpoint, headers=self.headers, params=query_parameters, timeout=60)
+
+        # If ratelimited, wait for the ratelimit to reset.
+        if response.status_code == 429:
+            reset_timestamp = int(response.headers["X-Ratelimit-Reset"])
+            reset_time = max(0, reset_timestamp - time())
+
+            await asyncio.sleep(reset_time)
+
+            return await self._send_request(endpoint, **query_parameters)
 
         return response.json()
