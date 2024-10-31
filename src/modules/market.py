@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 from modules.autocomplete.item import item_autocomplete
 from modules.autocomplete.world import world_autocomplete
 from modules.embedder.market_values import market_value_to_embedding
+from modules.embedder.history import history_to_embedding
 from utils.market_api import MarketApi
 from utils import get_default_world
 
@@ -18,7 +19,7 @@ class Market(commands.Cog):
         self.bot = bot
         self.market_api = MarketApi()
 
-    @commands.hybrid_command(name='market_value')
+    @commands.hybrid_command()
     @commands.cooldown(1, 5, commands.BucketType.user)
     @app_commands.autocomplete(item=item_autocomplete, world=world_autocomplete)
     async def market_value(self, ctx: commands.Context, item: str, world: str = None):
@@ -44,3 +45,30 @@ class Market(commands.Cog):
 
         # Send the embed.
         await ctx.send(embed=embed)
+
+    @commands.hybrid_command()
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    @app_commands.autocomplete(item=item_autocomplete, world=world_autocomplete)
+    async def item_history(self, ctx: commands.Context, item: str, world: str = None):
+        """Responds with the market history of an item.
+
+        Args:
+            ctx (commands.Context): The context of the command.
+            item (str): The name of the item to get the market history of.
+            world (str, optional): The world to get the market history from.
+        """
+        await ctx.defer()
+
+        # Get the default world if none is provided.
+        if not world:
+            world = get_default_world(ctx)
+
+        # Fetch the market history from the API.
+        market_history = await self.market_api.get_history(world, item)
+        meta_data = await self.market_api.get_meta_data(item)
+
+        # Create a pretty embed with the market history.
+        embed, file = history_to_embedding(world, market_history, meta_data)
+
+        # Send the embed.
+        await ctx.send(embed=embed, file=file)

@@ -1,5 +1,6 @@
-# pylint: disable=W0201
+# pylint: disable=W0201,E1101
 from modules.embedder.market_values import market_value_to_embedding, sale_data_to_expression
+from modules.embedder.history import history_to_embedding
 from utils.data.item_meta_data import NPCSaleData, ItemMetaData
 from utils.data.market_values import MarketValues
 from utils.market_api import MarketApi
@@ -77,6 +78,29 @@ class TestEmbedder:
         assert embed.fields[1].name == "Buy data"
         assert embed.fields[2].name == "Buy from"
         assert len(embed.fields) == 3
+
+    def test_history_to_embedding(self):
+        """Test the history_to_embedding function."""
+        # Arrange
+        history = [self.market_values, self.market_values, self.market_values]
+        history[0].day_average_sell += 200
+        history[0].day_average_buy += 200
+        history[0].time -= 1000
+
+        history[1].day_average_sell += 100
+        history[1].day_average_buy += 100
+        history[1].time -= 500
+
+        # Act
+        embed, file = history_to_embedding("Antica", history, self.meta_data)
+
+        # Assert
+        assert embed.description == "[Sample Item](https://tibia.fandom.com/wiki/Sample_Item) on Antica"
+        assert embed.fields[0].name == "Sell data"
+        assert embed.fields[1].name == "Buy data"
+        assert len(embed.fields) == 2
+        assert file.filename == "plot.png"
+        assert embed.image.url == "attachment://plot.png"
 
     @staticmethod
     def create_sample_npc_sale_data(name="Sample NPC", location="Town", price=100, currency_id=0) -> NPCSaleData:

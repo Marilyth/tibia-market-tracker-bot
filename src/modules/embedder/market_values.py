@@ -67,7 +67,7 @@ def market_value_to_embedding(world: str, market_values: MarketValues, meta_data
     embed.description = f"[{meta_data.wiki_name if meta_data.wiki_name else meta_data.name}]({meta_data.get_wiki_link()}) on {world}"
     embed.timestamp = datetime.fromtimestamp(market_values.time)
 
-    embed.set_thumbnail(url=ItemMetaData.id_to_image_link(market_values.id))
+    embed.set_thumbnail(url=meta_data.get_image_link())
 
     # Add the market values to the embed.
     sell_values = {
